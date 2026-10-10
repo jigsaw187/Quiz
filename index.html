@@ -50,6 +50,10 @@ input{flex:1;font:inherit;padding:12px;border-radius:12px;border:0;background:#1
 .reveal b{color:var(--gold)}
 .score{display:flex;justify-content:space-between;padding:12px 4px;border-bottom:1px solid #ffffff22;font-size:19px}
 .center{text-align:center}
+.tbar{height:8px;background:#ffffff22;border-radius:8px;overflow:hidden;margin:2px 0 8px}
+.tbar i{display:block;height:100%;width:100%;background:var(--gold)}
+.tbar i.low{background:var(--bad)}
+#tn{color:var(--gold)}
 pre{white-space:pre-wrap;font-size:13px;color:var(--dim)}
 .spin{font-size:44px;animation:s 1.2s linear infinite;display:inline-block}
 @keyframes s{to{transform:rotate(360deg)}}
@@ -670,7 +674,7 @@ async function makeQuestion(){
 }
 
 /* ---------- SETTINGS / SETUP ---------- */
-let S={players:['Player 1'],total:10,types:{song:1,char:1,emoji:1,text:1,first:1,plot:1,odd:1,c2m:1},bad:[]};
+let S={players:['Player 1'],total:10,types:{song:1,char:1,emoji:1,text:1,first:1,plot:1,odd:1,c2m:1},bad:[],timer:20};
 try{const x=JSON.parse(localStorage.getItem('ouaq')||'null');if(x&&x.players)S=Object.assign(S,x)}catch(e){}
 for(const k of ['song','char','emoji','text','first','plot','odd','c2m'])if(S.types[k]===undefined)S.types[k]=1;
 if(!Array.isArray(S.bad))S.bad=[];
@@ -684,11 +688,13 @@ function showSetup(){
   view(`<h1>✨ Once Upon a Quiz</h1><p class="sub">Pass-the-phone Disney trivia</p>
   <div class="card"><div class="lbl">Questions</div><div class="step"><button onclick="setN(-5)">−</button><b>${S.total}</b><button onclick="setN(5)">+</button><span class="hint" style="margin-left:auto">5–50</span></div></div>
   <div class="card"><div class="lbl">Question types</div><div class="chips">${chips}</div></div>
+  <div class="card"><div class="lbl">Timer per question (faster = more points)</div><div class="chips">${[[0,'Off'],[10,'10s'],[15,'15s'],[20,'20s'],[30,'30s']].map(([n,l])=>`<button class="chip ${(S.timer||0)===n?'on':''}" onclick="setT(${n})">${l}</button>`).join('')}</div></div>
   <div class="card"><div class="lbl">Players</div>${names}${S.players.length<6?`<button class="ghost" onclick="addP()">+ Add player</button>`:''}</div>
   <button class="big" onclick="startGame()">Start game</button>
   <button class="ghost" onclick="runTest()">Check content (tests song &amp; image lookups)</button>`);
 }
 function tg(k){S.types[k]=S.types[k]?0:1;if(!Object.values(S.types).some(Boolean))S.types[k]=1;save();showSetup()}
+function setT(n){S.timer=n;save();showSetup()}
 function setN(d){S.total=Math.max(5,Math.min(50,S.total+d));save();showSetup()}
 function addP(){S.players.push('Player '+(S.players.length+1));showSetup()}
 function rmP(i){S.players.splice(i,1);showSetup()}
@@ -697,7 +703,7 @@ function rmP(i){S.players.splice(i,1);showSetup()}
 function loading(msg){view(`<div class="center" style="padding-top:90px"><div class="spin">✨</div><p class="sub">${msg||'Picking a question…'}</p></div>`)}
 function startGame(){
   S.players=S.players.map((p,i)=>p.trim()||'Player '+(i+1)); save();
-  G={players:S.players.map(n=>({name:n,score:0})),total:S.total,types:{...S.types},idx:0,used:new Set(),q:null,pre:null,lastType:null};
+  G={players:S.players.map(n=>({name:n,score:0})),total:S.total,types:{...S.types},idx:0,used:new Set(),q:null,pre:null,lastType:null,tl:(S.timer||0)*1000};
   advance();
 }
 async function advance(){
@@ -717,10 +723,12 @@ function beginQ(){
   else if((q.type==='char'||q.type==='c2m'))stage=`<div class="stage zoom"><img id="zi" src="${esc(q.img)}" alt="" referrerpolicy="no-referrer"></div><p class="hint">It zooms out — guess early for more points</p>`;
   else if(q.type==='emoji')stage=`<div class="stage emo">${q.emoji}</div>`;
   else stage=`<div class="stage txt">${esc(q.text)}</div>`;
-  view(`<div class="top"><span>Question ${G.idx+1}/${G.total}</span><span>${esc(p.name)} · ${p.score} pts</span></div>
+  view(`<div class="top"><span>Question ${G.idx+1}/${G.total}</span><span>${esc(p.name)} · ${p.score} pts${G.tl?' · <b id="tn"></b>':''}</span></div>
+  ${G.tl?'<div class="tbar"><i id="tb"></i></div>':''}
   <h2>${esc(q.prompt)}</h2>${stage}
   <div class="choices">${q.options.map((o,i)=>`<button class="opt" onclick="answer(${i})">${esc(o)}</button>`).join('')}</div>
   <div id="after"></div>`);
+  startTimer();
   if(q.type==='song'){audio.src=q.audio;playClip()}
   if((q.type==='char'||q.type==='c2m'))startZoom();
   if(G.idx+1<G.total)G.pre=makeQuestion();
@@ -740,29 +748,48 @@ function playClip(){
   const pr=audio.play(); if(pr&&pr.catch)pr.catch(()=>{const h=$('#ph');if(h)h.textContent='Tap ▶ to play'});
 }
 function replay(){if(!G.done)playClip()}
+function startTimer(){
+  cancelAnimationFrame(G.traf); G.t0=performance.now(); if(!G.tl)return;
+  const tb=$('#tb'),tn=$('#tn');
+  const f=n=>{
+    if(G.done)return;
+    const e=n-G.t0,fr=Math.min(1,e/G.tl);
+    if(tb){tb.style.width=((1-fr)*100)+'%';if(fr>.75)tb.classList.add('low')}
+    if(tn)tn.textContent=Math.max(0,Math.ceil((G.tl-e)/1000))+'s';
+    if(fr>=1){answer(-1);return}
+    G.traf=requestAnimationFrame(f);
+  };
+  G.traf=requestAnimationFrame(f);
+}
 function startZoom(){
   const im=$('#zi');if(!im)return;
   im.style.transformOrigin=(35+rnd(31))+'% '+(30+rnd(31))+'%';
-  const t0=performance.now(),D=14000;G.zp=0;
+  const t0=performance.now(),D=G.tl||14000;G.zp=0;
   const f=n=>{G.zp=Math.min(1,(n-t0)/D);im.style.transform='scale('+Math.pow(7,1-G.zp)+')';if(G.zp<1&&!G.done)G.raf=requestAnimationFrame(f)};
   G.raf=requestAnimationFrame(f);
 }
 function answer(i){
   if(G.done)return;G.done=true;
   const q=G.q,p=G.players[G.idx%G.players.length];
-  clearTimeout(G.st);cancelAnimationFrame(G.barRaf);cancelAnimationFrame(G.raf);audio.pause();
+  clearTimeout(G.st);cancelAnimationFrame(G.barRaf);cancelAnimationFrame(G.raf);cancelAnimationFrame(G.traf);audio.pause();
   const ok=i===q.answer;
+  const secs=G.tl?Math.min(G.tl,performance.now()-G.t0)/1000:0;
   let pts=0;
   if(ok){
-    pts=100;
-    if(q.type==='song')pts=Math.max(40,100-20*(G.plays-1));
-    if((q.type==='char'||q.type==='c2m'))pts=Math.round(100-60*(G.zp||0));
+    if(G.tl){
+      pts=Math.round(100-60*Math.min(1,secs*1000/G.tl));
+      if(q.type==='song')pts=Math.max(20,pts-15*(G.plays-1));
+    }else{
+      pts=100;
+      if(q.type==='song')pts=Math.max(40,100-20*(G.plays-1));
+      if((q.type==='char'||q.type==='c2m'))pts=Math.round(100-60*(G.zp||0));
+    }
     p.score+=pts;
   }
   const zi=$('#zi');if(zi){zi.style.transition='transform .6s';zi.style.transform='scale(1)'}
   document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(j===q.answer)b.classList.add('ok');else if(j===i)b.classList.add('bad')});
   const last=G.idx+1>=G.total;
-  $('#after').innerHTML=`<p class="reveal">${ok?`✅ Correct! <b>+${pts}</b>`:'❌ Nope'}<br><b>${esc(q.reveal)}</b></p>
+  $('#after').innerHTML=`<p class="reveal">${ok?`✅ Correct! <b>+${pts}</b>${G.tl?` <span class="hint">(${secs.toFixed(1)}s)</span>`:''}`:(i<0?'⏰ Out of time!':'❌ Nope')}<br><b>${esc(q.reveal)}</b></p>
   <button class="big" onclick="nextQ()">${last?'See results':'Next question'}</button>${(q.type==='char'||q.type==='c2m')?'<button class="ghost" id="flag" onclick="flagBad()">🚩 Bad picture — never show this one again</button>':''}`;
 }
 function flagBad(){const n=G.q&&(G.q.charName||G.q.reveal);if(n&&!S.bad.includes(n)){S.bad.push(n);save()}const b=$('#flag');if(b){b.textContent='Hidden ✓';b.disabled=true}}
