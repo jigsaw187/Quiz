@@ -181,54 +181,60 @@ const pick=(a,n)=>shuffle(a).slice(0,n);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm=s=>String(s).toLowerCase().replace(/\(.*?\)/g,' ').replace(/[’']/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
 const view=h=>{app.innerHTML=h;window.scrollTo(0,0)};
-function fetchT(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).then(r=>{if(!r.ok)throw new Error('http');return r}).finally(()=>clearTimeout(t))}
+function fetchT(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).then(r=>{if(!r.ok)throw new Error('http '+r.status);return r}).finally(()=>clearTimeout(t))}
 function jsonp(url,ms=7000){return new Promise((res,rej)=>{const cb='cb'+Date.now()+rnd(1e6);const s=document.createElement('script');const t=setTimeout(()=>{clean();rej(new Error('timeout'))},ms);function clean(){clearTimeout(t);delete window[cb];s.remove()}window[cb]=d=>{clean();res(d)};s.onerror=()=>{clean();rej(new Error('jsonp'))};s.src=url+'&callback='+cb;document.head.appendChild(s)})}
 function preload(src){return new Promise((res,rej)=>{const im=new Image();const t=setTimeout(()=>rej(new Error('t')),9000);im.onload=()=>{clearTimeout(t);im.naturalWidth<120?rej(new Error('small')):res(im)};im.onerror=()=>{clearTimeout(t);rej(new Error('err'))};im.src=src})}
 function mk(correct,pool){const wrong=pick([...new Set(pool)].filter(x=>x!==correct),3);const options=shuffle([correct,...wrong]);return{options,answer:options.indexOf(correct)}}
 
 /* ---------- CONTENT FETCHERS ---------- */
 const songCache=new Map(), imgCache=new Map();
-// Apple's search API allows only ~20 calls/minute, so calls are spaced out.
-let MINGAP=1800, lastCall=0, gate=Promise.resolve();
-const DIAG={fetchErr:'',jsonpErr:'',via:'',n:null,sample:[],lastTerm:''};
-function itunesOnce(url){
-  return (async()=>{
-    try{const d=await (await fetchT(url,8000)).json();DIAG.via='fetch';return d}
-    catch(e){DIAG.fetchErr=String(e&&e.message||e);const d=await jsonp(url,8000);DIAG.via='jsonp';return d}
-  })();
-}
-function itunes(term){
+// Song sources: Deezer first (no strict limit), Apple as a fallback (Apple allows only ~20 calls/min).
+let MINGAP=2500, lastCall=0, gate=Promise.resolve();
+const DIAG={deezer:'-',apple:'-',lastTerm:'',n:null,sample:[],src:''};
+function appleSearch(term){
   const url='https://itunes.apple.com/search?media=music&entity=song&limit=25&country=US&term='+encodeURIComponent(term);
   const run=gate.then(async()=>{
     const wait=Math.max(0,lastCall+MINGAP-Date.now()); if(wait)await new Promise(r=>setTimeout(r,wait));
-    lastCall=Date.now(); DIAG.lastTerm=term;
-    try{return await itunesOnce(url)}
-    catch(e){
-      DIAG.jsonpErr=String(e&&e.message||e);
-      await new Promise(r=>setTimeout(r,4000)); lastCall=Date.now();
-      return await itunesOnce(url);
-    }
+    lastCall=Date.now();
+    try{return await (await fetchT(url,8000)).json()}
+    catch(e){DIAG.apple='fetch: '+(e&&e.message||e);return await jsonp(url,8000)}
   });
   gate=run.catch(()=>{});
   return run;
 }
+async function fromApple(term){
+  const d=await appleSearch(term); DIAG.apple='ok';
+  return (d.results||[]).map(r=>({previewUrl:r.previewUrl,trackName:r.trackName,collectionName:r.collectionName,artistName:r.artistName}));
+}
+async function fromDeezer(term){
+  const d=await jsonp('https://api.deezer.com/search?limit=25&output=jsonp&q='+encodeURIComponent(term),8000);
+  if(d&&d.error)throw new Error('deezer '+JSON.stringify(d.error).slice(0,80));
+  DIAG.deezer='ok';
+  return (d.data||[]).map(r=>({previewUrl:r.preview,trackName:r.title,collectionName:(r.album&&r.album.title)||'',artistName:(r.artist&&r.artist.name)||''}));
+}
+function bestMatch(list,title,movie){
+  const t=norm(title),mv=movie.toLowerCase().replace(/^the /,''); let best=null,bs=-99;
+  for(const r of list){
+    if(!r.previewUrl)continue;
+    const n=norm(r.trackName||''); if(!(n===t||n.startsWith(t+' ')))continue;
+    const coll=((r.collectionName||'')+' '+(r.artistName||'')).toLowerCase();
+    let sc=0; if(coll.includes(mv))sc+=3; if(/soundtrack|disney|cast|original/.test(coll))sc+=2; if(/karaoke|tribute|lullaby|instrumental|made famous|kids|piano|cover/.test(coll))sc-=6;
+    if(sc>bs){bs=sc;best=r}
+  }
+  return bs<0?null:best;
+}
 async function findPreview(title,movie){
   const key=title+'|'+movie; if(songCache.has(key))return songCache.get(key);
-  let best=null;
-  try{
-    const d=await itunes(title+' '+movie); const t=norm(title); let bs=-99;
-    DIAG.n=(d.results||[]).length;
-    DIAG.sample=(d.results||[]).slice(0,3).map(r=>r.trackName+' — '+r.collectionName+(r.previewUrl?'':' [no preview]'));
-    for(const r of d.results||[]){
-      if(!r.previewUrl)continue;
-      const n=norm(r.trackName||''); if(!(n===t||n.startsWith(t+' ')))continue;
-      const coll=((r.collectionName||'')+' '+(r.artistName||'')).toLowerCase();
-      let sc=0; if(coll.includes(movie.toLowerCase().replace(/^the /,'')))sc+=3; if(/soundtrack|disney|cast|original/.test(coll))sc+=2; if(/karaoke|tribute|lullaby|instrumental|made famous|kids|piano|cover/.test(coll))sc-=6;
-      if(sc>bs){bs=sc;best=r}
-    }
-    if(bs<0)best=null;
-  }catch(e){best=null;DIAG.jsonpErr=String(e&&e.message||e)}
-  if(best||DIAG.n!==null)songCache.set(key,best);
+  const term=title+' '+movie; DIAG.lastTerm=term;
+  let best=null,answered=false;
+  for(const [name,fn] of [['deezer',fromDeezer],['apple',fromApple]]){
+    try{
+      const list=await fn(term); answered=true; DIAG.n=list.length;
+      DIAG.sample=list.slice(0,3).map(r=>r.trackName+' — '+r.collectionName+(r.previewUrl?'':' [no preview]'));
+      best=bestMatch(list,title,movie); if(best){DIAG.src=name;break}
+    }catch(e){DIAG[name]=String(e&&e.message||e)}
+  }
+  if(best||answered)songCache.set(key,best);
   return best;
 }
 async function fetchCharImage(name){
@@ -406,7 +412,7 @@ async function runTest(full,skipChars){
   if(!skipChars)await pool(CHARS,5,async c=>{const u=await fetchCharImage(c);u?okC++:badC.push(c);upd()});
   songCache.clear();
   for(const s of songs){const r=await findPreview(s[0],s[1]);r?okS++:badS.push(s[0]);upd()}
-  const dg=`via: ${DIAG.via||'none'}\nfetch error: ${DIAG.fetchErr||'-'}\nretry error: ${DIAG.jsonpErr||'-'}\nlast results: ${DIAG.n}\nlast term: ${DIAG.lastTerm}\n${DIAG.sample.join('\n')}`;
+  const dg=`Deezer: ${DIAG.deezer}\nApple: ${DIAG.apple}\nlast term: ${DIAG.lastTerm}\nlast results: ${DIAG.n}\n${DIAG.sample.join('\n')}`;
   view(`<div class="card"><h2>Results</h2>
   ${skipChars?'':`<p>🖼️ Characters with images: <b>${okC}/${CHARS.length}</b></p>${badC.length?`<pre>Missing: ${esc(badC.join(', '))}</pre>`:''}`}
   <p>🎵 Songs with previews: <b>${okS}/${songs.length}</b>${full?'':' (sample)'}</p>${badS.length?`<pre>Missing: ${esc(badS.join(', '))}</pre>`:''}
