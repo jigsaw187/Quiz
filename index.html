@@ -191,7 +191,11 @@ const EMOJI=[
 ["😢😡😊","Inside Out"],["🐵🐻🌴","The Jungle Book"],["👱‍♀️🏮🍳","Tangled"],["🐸👸🎺","The Princess and the Frog"],
 ["🐭🎩🧹","Fantasia"],["🦌🌲🐰","Bambi"],["🐕🍝🌙","Lady and the Tramp"],["👠🎃🐭","Cinderella"],["🐇⏰🫖","Alice in Wonderland"],
 ["🐼🔴🎤","Turning Red"],["🤖🦸‍♂️🏙️","Big Hero 6"],["🐰👮🦊","Zootopia"],["🌺👽🏝️","Lilo & Stitch"],["🌳🦍🌿","Tarzan"],
-["🎃💀🎄","The Nightmare Before Christmas"],["🏠🕯️🦋","Encanto"],["⚡🐴🏛️","Hercules"],["🥀😴🐉","Sleeping Beauty"],["🪵👦🦗","Pinocchio"]
+["🎃💀🎄","The Nightmare Before Christmas"],["🏠🕯️🦋","Encanto"],["⚡🐴🏛️","Hercules"],["🥀😴🐉","Sleeping Beauty"],["🪵👦🦗","Pinocchio"],
+["🐭🕵️🔍","The Great Mouse Detective"],["🦊🐕🌲","The Fox and the Hound"],["🏹🐻🏰","Brave"],["🐲🌊🏹","Raya and the Last Dragon"],
+["🏴‍☠️🚀🪐","Treasure Planet"],["🦎👑🦙","The Emperor's New Groove"],["🐻❄️🏔️🏹","Brother Bear"],["🐕📺🦸","Bolt"],["🎮🍬🏆","Wreck-It Ralph"],
+["🔔⛪🎭","The Hunchback of Notre Dame"],["🗡️🪄🧙‍♂️","The Sword in the Stone"],["🐱🎩🎻","The Aristocats"],["🏹🦊🟢","Robin Hood"],
+["🔥💧🏙️","Elemental"],["🎷🌌👻","Soul"],["🌊👦🛵","Luca"],["🐜🌾🦗","A Bug's Life"],["☂️🎠🎩","Mary Poppins"],["🧤⛪🔔","Frozen II"]
 ];
 
 // [question, correct, [3 wrong]]
@@ -261,8 +265,216 @@ const TEXT=[
 ["What kind of bird is Zazu in The Lion King?","A hornbill",["A parrot","A toucan","A hawk"]],
 ["What is the name of the rooster in Moana?","Heihei",["Chanticleer","Rocky","Foghorn"]],
 ["What is the name of Miguel's dog in Coco?","Dante",["Pepita","Pluto","Abuelita"]],
-["What is the name of the cat in Cinderella?","Lucifer",["Figaro","Oliver","Duchess"]]
+["What is the name of the cat in Cinderella?","Lucifer",["Figaro","Oliver","Duchess"]],
+["Who is the villain in The Little Mermaid?","Ursula",["Jafar","Hades","Maleficent"]],
+["What color is the Genie in the original Aladdin?","Blue",["Green","Purple","Red"]],
+["Which of these is one of the hyenas in The Lion King?","Shenzi",["Zira","Kovu","Sarafina"]],
+["What is the name of Moana's pet pig?","Pua",["Wilbur","Pumbaa","Pete"]],
+["What is the name of the giant, glittery crab in Moana?","Tamatoa",["Sebastian","Mater","Kakamora"]],
+["Who is the leader of the Huns in Mulan?","Shan Yu",["Chi-Fu","Yao","Ling"]],
+["What name does Mulan use when she disguises herself as a soldier?","Ping",["Ling","Yao","Chien-Po"]],
+["What is the name of Hercules' trainer?","Phil",["Pain","Panic","Hades"]],
+["Who controls a person's fate in Hercules?","The Fates",["The Muses","The Furies","The Graces"]],
+["Who voiced the Genie in the 1992 film Aladdin?","Robin Williams",["Billy Crystal","Eddie Murphy","Jim Carrey"]],
+["Who voiced Mushu in Mulan?","Eddie Murphy",["Robin Williams","Billy Crystal","Dwayne Johnson"]],
+["Who voiced Mike Wazowski in Monsters, Inc.?","Billy Crystal",["John Goodman","Steve Buscemi","Tom Hanks"]],
+["Who voices Woody in the Toy Story films?","Tom Hanks",["Tim Allen","Billy Crystal","Robin Williams"]],
+["Who voices Buzz Lightyear in the Toy Story films?","Tim Allen",["Tom Hanks","Chris Pratt","Billy Crystal"]],
+["Who voices Elsa in Frozen?","Idina Menzel",["Kristen Bell","Demi Lovato","Auliʻi Cravalho"]],
+["Who voices Maui in Moana?","Dwayne Johnson",["Eddie Murphy","Jason Momoa","Will Smith"]],
+["Who voiced Scar in the original The Lion King?","Jeremy Irons",["James Earl Jones","Nathan Lane","Matthew Broderick"]],
+["Who voiced Mufasa in the original The Lion King?","James Earl Jones",["Jeremy Irons","Nathan Lane","Rowan Atkinson"]],
+["Who voices Dory in Finding Nemo?","Ellen DeGeneres",["Albert Brooks","Amy Poehler","Whoopi Goldberg"]],
+["What instrument does Miguel dream of playing in Coco?","Guitar",["Trumpet","Violin","Piano"]],
+["What is the family business in Coco?","Making shoes",["Baking bread","Making guitars","Tailoring"]],
+["Who is Miguel's musical idol in Coco?","Ernesto de la Cruz",["Héctor","Imelda","Dante"]],
+["What kind of flower petals form the bridge to the Land of the Dead in Coco?","Marigold",["Rose","Lily","Daisy"]],
+["What is the name of the toy dinosaur in Toy Story?","Rex",["Hamm","Slinky","Trixie"]],
+["What is the name of the piggy bank in Toy Story?","Hamm",["Rex","Sid","Woody"]],
+["Who is the toy next door bully in Toy Story?","Sid",["Al","Lotso","Andy"]],
+["What is the little girl called in Monsters, Inc.?","Boo",["Bonnie","Penny","Riley"]],
+["What is Mr. Incredible's real name?","Bob Parr",["Lucius Best","Buddy Pine","Tony Rydinger"]],
+["What does Edna Mode refuse to put on supersuits?","Capes",["Masks","Boots","Gloves"]],
+["Where does Nemo end up after being captured?","A dentist's fish tank",["A pet store window","A cruise ship pond","An aquarium in Paris"]],
+["In which city do Marlin and Dory end up traveling toward Nemo?","Sydney",["Los Angeles","Auckland","Honolulu"]],
+["What is the name of Remy's brother in Ratatouille?","Emile",["Django","Linguini","Skinner"]],
+["Who is the grumpy food critic in Ratatouille?","Anton Ego",["Gusteau","Skinner","Colette"]],
+["What is Flynn Rider's real name in Tangled?","Eugene Fitzherbert",["Maximus","Frederick Fitz","Edward Fairfax"]],
+["What is the name of the horse in Tangled?","Maximus",["Khan","Philippe","Angus"]],
+["What is the name of Merida's horse in Brave?","Angus",["Maximus","Philippe","Khan"]],
+["What are the names of Merida's triplet brothers?","Hamish, Hubert and Harris",["Huey, Dewey and Louie","Ron, Rob and Ray","Hank, Harry and Hugh"]],
+["What is the name of the teapot in Beauty and the Beast?","Mrs. Potts",["Chip","Cogsworth","Lumière"]],
+["What is the name of the clock in Beauty and the Beast?","Cogsworth",["Lumière","Chip","Maurice"]],
+["What flower is tied to the Beast's curse?","A rose",["A lily","A tulip","An orchid"]],
+["What are the names of the three good fairies in Sleeping Beauty?","Flora, Fauna and Merryweather",["Tink, Silvermist and Rosetta","Anna, Bella and Cora","Winken, Blinken and Nod"]],
+["What is the name of Maleficent's pet raven?","Diablo",["Iago","Zazu","Hei Hei"]],
+["Which of these is NOT one of the seven dwarfs?","Wheezy",["Grumpy","Sleepy","Bashful"]],
+["Which of the seven dwarfs never speaks?","Dopey",["Doc","Sneezy","Happy"]],
+["What does Prince Charming use to find Cinderella?","A glass slipper",["A ring","A mask","A necklace"]],
+["What are the names of Cinderella's stepsisters?","Anastasia and Drizella",["Esmeralda and Gertrude","Lucinda and Prunella","Anna and Elsa"]],
+["What are the names of Wendy's two brothers in Peter Pan?","John and Michael",["Tom and Harry","Peter and Paul","Tim and Tobias"]],
+["Who is Captain Hook's first mate in Peter Pan?","Mr. Smee",["Starkey","Cecco","Noodler"]],
+["What is the name of the skunk in Bambi?","Flower",["Thumper","Faline","Friend Owl"]],
+["What kind of animal is Kaa in The Jungle Book?","A snake",["A panther","A bear","An orangutan"]],
+["What kind of animal is Bagheera?","A panther",["A tiger","A wolf","A bear"]],
+["What is the name of Jafar's parrot in Aladdin?","Iago",["Zazu","Abu","Rajah"]],
+["Which of these is a theme park at Walt Disney World?","EPCOT",["Islands of Adventure","Busch Gardens","Legoland"]],
+["Which castle sits at the center of Magic Kingdom in Florida?","Cinderella Castle",["Sleeping Beauty Castle","Beast's Castle","Arendelle Castle"]],
+["Which castle is at Disneyland in California?","Sleeping Beauty Castle",["Cinderella Castle","Frozen Castle","Tangled Castle"]],
+["Which animator co-created Mickey Mouse with Walt Disney?","Ub Iwerks",["Roy Disney","Don Bluth","Chuck Jones"]],
+["Which character did Walt Disney create before Mickey Mouse?","Oswald the Lucky Rabbit",["Donald Duck","Goofy","Pluto"]],
+["In what year did Disney acquire Marvel?","2009",["2006","2012","2001"]],
+["In what year did Disneyland open?","1955",["1950","1962","1971"]],
+["In what year did Disney+ launch?","2019",["2017","2020","2021"]],
+["What animal is Flash, the DMV worker in Zootopia?","A sloth",["A rabbit","A fox","A cheetah"]],
+["Who is the cheetah police dispatcher in Zootopia?","Clawhauser",["Lionheart","Bellwether","Bogo"]],
+["What is the name of the city in Big Hero 6?","San Fransokyo",["Neo-Tokyo","New Tokyo","Tokyo Bay"]],
+["What is the name of Hiro's older brother in Big Hero 6?","Tadashi",["Wasabi","Fred","Honey"]],
+["Who is Riley's imaginary friend in Inside Out?","Bing Bong",["Bubbles","Fizz","Pocket"]],
+["Which of these is NOT one of Riley's original five emotions in Inside Out?","Anxiety",["Fear","Disgust","Anger"]],
+["What is the name of the matriarch of the Madrigal family?","Abuela Alma",["Abuela Julieta","Abuela Pepa","Abuela Dolores"]],
+["Which Madrigal has super strength?","Luisa",["Isabela","Dolores","Camilo"]],
+["What is Lilo's older sister called?","Nani",["Pleakley","Jumba","Cobra"]],
+["What Hawaiian word for family is a theme of Lilo & Stitch?","Ohana",["Aloha","Mahalo","Kupuna"]],
+["Who is the villain in Pocahontas?","Governor Ratcliffe",["John Smith","Kocoum","Powhatan"]],
+["Who is the villain in The Hunchback of Notre Dame?","Judge Claude Frollo",["Quasimodo","Phoebus","Clopin"]],
+["Who is the villain in The Emperor's New Groove?","Yzma",["Kronk","Pacha","Kuzco"]]
 ];
+
+
+// [title, US release year, 1 if Pixar]
+const MOVIES=[
+["Snow White and the Seven Dwarfs",1937],["Pinocchio",1940],["Fantasia",1940],["Dumbo",1941],["Bambi",1942],["Cinderella",1950],["Alice in Wonderland",1951],
+["Peter Pan",1953],["Lady and the Tramp",1955],["Sleeping Beauty",1959],["101 Dalmatians",1961],["The Sword in the Stone",1963],["Mary Poppins",1964],
+["The Jungle Book",1967],["The Aristocats",1970],["Robin Hood",1973],["The Rescuers",1977],["The Fox and the Hound",1981],["The Black Cauldron",1985],
+["The Great Mouse Detective",1986],["Oliver & Company",1988],["The Little Mermaid",1989],["The Rescuers Down Under",1990],["Beauty and the Beast",1991],
+["Aladdin",1992],["The Lion King",1994],["Pocahontas",1995],["Toy Story",1995,1],["The Hunchback of Notre Dame",1996],["Hercules",1997],["Mulan",1998],
+["A Bug's Life",1998,1],["Tarzan",1999],["Toy Story 2",1999,1],["Dinosaur",2000],["The Emperor's New Groove",2000],["Monsters, Inc.",2001,1],
+["Atlantis: The Lost Empire",2001],["Lilo & Stitch",2002],["Treasure Planet",2002],["Finding Nemo",2003,1],["Brother Bear",2003],["The Incredibles",2004,1],
+["Cars",2006,1],["Meet the Robinsons",2007],["Ratatouille",2007,1],["WALL-E",2008,1],["Bolt",2008],["The Princess and the Frog",2009],["Up",2009,1],
+["Toy Story 3",2010,1],["Tangled",2010],["Brave",2012,1],["Wreck-It Ralph",2012],["Monsters University",2013,1],["Frozen",2013],["Big Hero 6",2014],
+["Inside Out",2015,1],["Zootopia",2016],["Moana",2016],["Finding Dory",2016,1],["Coco",2017,1],["Incredibles 2",2018,1],["Ralph Breaks the Internet",2018],
+["Toy Story 4",2019,1],["Frozen II",2019],["Onward",2020,1],["Soul",2020,1],["Raya and the Last Dragon",2021],["Luca",2021,1],["Encanto",2021],
+["Turning Red",2022,1],["Lightyear",2022,1],["Strange World",2022],["Elemental",2023,1],["Wish",2023],["Inside Out 2",2024,1],["Moana 2",2024]
+];
+
+// [plot clue with no names, movie title]
+const PLOTS=[
+["A wooden puppet who dreams of becoming a real boy is guided by a tiny talking insect.","Pinocchio"],
+["A flying elephant with enormous ears is mocked until a mouse helps him believe in himself.","Dumbo"],
+["A young deer grows up in the forest with a rabbit and a skunk as friends after a tragedy.","Bambi"],
+["A girl forced to work for her cruel stepfamily gets one magical night at the ball thanks to a pumpkin carriage.","Cinderella"],
+["A girl falls down a hole while chasing a hurried rabbit and ends up at a very strange tea party.","Alice in Wonderland"],
+["Three siblings fly to a magical island with a boy who never grows up.","Peter Pan"],
+["A pampered dog and a street-smart mutt share a famous spaghetti dinner.","Lady and the Tramp"],
+["A princess is cursed by a spiteful fairy to fall into a deep sleep, and three good fairies try to protect her.","Sleeping Beauty"],
+["A villain with a two-tone hairstyle wants to turn puppies into a fur coat.","101 Dalmatians"],
+["A nanny who arrives by umbrella teaches two children that chores can be fun.","Mary Poppins"],
+["A boy raised by wolves is told he must leave the jungle because of a fearsome tiger.","The Jungle Book"],
+["A young mermaid trades her voice to a sea witch for a chance to meet a human prince.","The Little Mermaid"],
+["A bookish girl is held prisoner by a cursed prince in an enchanted castle full of living objects.","Beauty and the Beast"],
+["A street thief finds a magic lamp and uses his wishes to impress a princess.","Aladdin"],
+["A lion cub flees his kingdom after his uncle's treacherous plot and learns to stop worrying.","The Lion King"],
+["A young woman befriends a settler and tries to stop a war between two peoples.","Pocahontas"],
+["A bell ringer hidden in a cathedral longs to join the festival below.","The Hunchback of Notre Dame"],
+["The son of a god is stripped of his powers and must prove himself a true hero to return home.","Hercules"],
+["A girl disguises herself as a man to take her father's place in the army.","Mulan"],
+["A boy raised by gorillas meets humans for the first time.","Tarzan"],
+["An arrogant emperor is turned into a llama and must rely on a humble villager to get home.","The Emperor's New Groove"],
+["A lonely girl adopts a blue alien she thinks is a dog on a Hawaiian island.","Lilo & Stitch"],
+["A clownfish crosses the ocean to find his missing son with the help of a forgetful fish.","Finding Nemo"],
+["A family of retired superheroes is forced back into action.","The Incredibles"],
+["A rookie race car gets stuck in a forgotten desert town along an old highway.","Cars"],
+["A rat with a gifted sense of smell dreams of becoming a chef in Paris.","Ratatouille"],
+["A lonely trash-compacting robot falls for a sleek probe and ends up in space.","WALL-E"],
+["An elderly widower ties thousands of balloons to his house and sails off to South America.","Up"],
+["A waitress dreams of owning a restaurant but is turned into an amphibian after kissing a prince.","The Princess and the Frog"],
+["A girl with magical long hair escapes her tower with the help of a charming thief.","Tangled"],
+["A princess whose archery contest backfires must undo a curse involving a bear.","Brave"],
+["An arcade villain tires of being the bad guy and goes game-hopping to win a medal.","Wreck-It Ralph"],
+["A queen with icy powers isolates herself while her sister sets out to bring her back.","Frozen"],
+["A boy and an inflatable healthcare robot form a team of high-tech heroes.","Big Hero 6"],
+["A young girl's emotions, living inside her head, struggle when her family moves to a new city.","Inside Out"],
+["A rabbit becomes the first of her kind on the police force and teams up with a sly fox.","Zootopia"],
+["A chosen girl sails past the reef to restore the heart of an island goddess.","Moana"],
+["A boy who dreams of being a musician is transported to the land of the dead during a festival.","Coco"],
+["A talking toy cowboy feels threatened when a new space ranger arrives in his owner's bedroom.","Toy Story"],
+["Two monsters who power their city with screams discover that laughter is stronger.","Monsters, Inc."],
+["A tiny ant recruits circus bugs to fight off a gang of grasshoppers.","A Bug's Life"],
+["A girl with no magical gift tries to save her enchanted family home.","Encanto"],
+["A teenager turns into a giant red panda whenever she gets too emotional.","Turning Red"],
+["A jazz musician's soul gets separated from his body right before his big break.","Soul"],
+["Two sea monster boys spend a summer in a sleepy Italian seaside town.","Luca"],
+["A warrior princess searches for the last dragon to save her fractured land.","Raya and the Last Dragon"],
+["A teenager wishes on a star in a kingdom where the king guards everyone's wishes.","Wish"],
+["Two elf brothers go on a quest to spend one more day with their late father.","Onward"],
+["A tiny detective mouse races to stop a villainous rat.","The Great Mouse Detective"],
+["A fox and a hound puppy become friends but are pushed to be enemies as they grow up.","The Fox and the Hound"],
+["A fox in a green hood steals from the rich to help the poor, with a bear as his sidekick.","Robin Hood"],
+["A pampered family of cats is abducted by a butler and rescued by a scruffy alley cat.","The Aristocats"],
+["A boy who pulls a sword from a stone is trained by a wizard who turns him into animals.","The Sword in the Stone"],
+["A stray kitten in New York joins a gang of dogs led by a street-smart terrier.","Oliver & Company"],
+["A dog who thinks he has superpowers discovers his TV show is fake and goes on a road trip.","Bolt"],
+["A restless teen joins a space-pirate voyage in search of a legendary hoard.","Treasure Planet"],
+["A young hunter is transformed into a bear after taking revenge.","Brother Bear"],
+["A linguist leads an expedition to find a lost underwater civilization.","Atlantis: The Lost Empire"],
+["A hero mom takes the lead job while dad manages the house and a baby whose powers are just starting.","Incredibles 2"],
+["Toys end up at a daycare as their owner heads off to college.","Toy Story 3"],
+["A forgetful blue fish sets out to find her long-lost family.","Finding Dory"],
+["Two future scare partners begin as rivals at monster college.","Monsters University"],
+["Two video game friends travel to the web to find a replacement part.","Ralph Breaks the Internet"],
+["A toy made from a spork has an identity crisis.","Toy Story 4"],
+["A cowboy toy is kidnapped by a collector and learns about his own TV-show past.","Toy Story 2"],
+["A queen follows a mysterious voice into an enchanted forest to learn the origin of her powers.","Frozen II"],
+["A voyager answers a call from her ancestors and sails to far-off waters.","Moana 2"],
+["A teenager's mind gets new emotions as she hits puberty.","Inside Out 2"],
+["A fire girl and a water boy fall in love in a city where elements live apart.","Elemental"],
+["A conductor introduces animated shorts set to classical music, including one about a sorcerer's apprentice.","Fantasia"],
+["A princess hides in the woods with seven miners after her stepmother's jealousy turns deadly.","Snow White and the Seven Dwarfs"],
+["Two mice from a rescue society go to save a kidnapped orphan girl.","The Rescuers"],
+["A pig-keeper's assistant tries to stop an evil king from raising an army of the dead.","The Black Cauldron"]
+];
+
+// [category, members, pool the odd one comes from]
+const ODD=[
+["Disney Princesses",["Cinderella","Snow White","Aurora","Ariel","Belle","Jasmine","Mulan","Tiana","Rapunzel","Merida","Moana","Pocahontas"],["Maleficent","Ursula","Tinker Bell","Minnie Mouse","Cruella de Vil","Mother Gothel"]],
+["Disney villains",["Scar","Ursula","Jafar","Hades","Maleficent","Gaston","Cruella de Vil","Captain Hook","Mother Gothel","Shere Khan"],["Simba","Aladdin","Hercules","Baloo","Woody","Mowgli","Flynn Rider","Mushu"]],
+["Disney sidekicks",["Mushu","Abu","Pascal","Olaf","Sebastian","Jiminy Cricket","Timon","Flounder"],["Scar","Jafar","Elsa","Belle","Hades","Gaston"]],
+["Frozen characters",["Elsa","Anna","Olaf","Kristoff","Sven","Hans"],["Rapunzel","Moana","Belle","Ariel","Mulan"]],
+["Toy Story characters",["Woody","Buzz Lightyear","Rex","Hamm","Slinky Dog","Mr. Potato Head","Jessie","Bo Peep"],["Remy","Nemo","Dory","Sulley","Mike Wazowski","Lightning McQueen"]],
+["The Lion King characters",["Simba","Nala","Mufasa","Scar","Timon","Pumbaa","Rafiki","Zazu"],["Baloo","Mushu","Abu","Sebastian","Olaf"]],
+["fish",["Nemo","Dory","Marlin","Flounder"],["Sebastian","Olaf","Abu","Pumbaa"]],
+["birds",["Zazu","Iago","Hei Hei","Donald Duck"],["Simba","Mushu","Sebastian","Pumbaa"]],
+["robots",["WALL-E","EVE","Baymax"],["Woody","Remy","Olaf","Genie"]],
+["movies from Walt Disney Animation (not Pixar)",["Frozen","Tangled","Zootopia","Moana","Encanto","Big Hero 6","Wreck-It Ralph","Raya and the Last Dragon","The Princess and the Frog","Bolt","Wish","Strange World"],["Coco","Up","Inside Out","Toy Story","Soul","Luca","Finding Nemo","Ratatouille"]],
+["movies about a dog",["Lady and the Tramp","101 Dalmatians","Bolt","Oliver & Company"],["Dumbo","Aladdin","The Lion King","Frozen","Finding Nemo","Pinocchio"]],
+["movies set mostly underwater or at sea",["Finding Nemo","Finding Dory","The Little Mermaid"],["Dumbo","Aladdin","The Lion King","Tangled","Cars","Up"]]
+];
+
+// character -> the one movie they are from (titles match MOVIES)
+const CHARMOVIE={
+"Simba":"The Lion King","Nala":"The Lion King","Scar":"The Lion King","Mufasa":"The Lion King","Timon":"The Lion King","Pumbaa":"The Lion King","Rafiki":"The Lion King","Zazu":"The Lion King",
+"Elsa":"Frozen","Anna":"Frozen","Olaf":"Frozen","Kristoff":"Frozen","Hans":"Frozen",
+"Moana":"Moana","Maui":"Moana","Hei Hei":"Moana",
+"Ariel":"The Little Mermaid","Ursula":"The Little Mermaid","Sebastian":"The Little Mermaid","Flounder":"The Little Mermaid",
+"Belle":"Beauty and the Beast","Beast":"Beauty and the Beast","Gaston":"Beauty and the Beast",
+"Cinderella":"Cinderella","Aurora":"Sleeping Beauty","Maleficent":"Sleeping Beauty","Snow White":"Snow White and the Seven Dwarfs",
+"Rapunzel":"Tangled","Flynn Rider":"Tangled","Mother Gothel":"Tangled",
+"Mulan":"Mulan","Mushu":"Mulan",
+"Jasmine":"Aladdin","Aladdin":"Aladdin","Genie":"Aladdin","Jafar":"Aladdin","Abu":"Aladdin","Iago":"Aladdin",
+"Pocahontas":"Pocahontas","Tiana":"The Princess and the Frog","Merida":"Brave",
+"Hercules":"Hercules","Hades":"Hercules","Megara":"Hercules","Tarzan":"Tarzan",
+"Baloo":"The Jungle Book","Mowgli":"The Jungle Book","Bagheera":"The Jungle Book","Shere Khan":"The Jungle Book","King Louie":"The Jungle Book",
+"Peter Pan":"Peter Pan","Tinker Bell":"Peter Pan","Captain Hook":"Peter Pan",
+"Cheshire Cat":"Alice in Wonderland","Mad Hatter":"Alice in Wonderland","Queen of Hearts":"Alice in Wonderland",
+"Dumbo":"Dumbo","Timothy Q. Mouse":"Dumbo","Bambi":"Bambi","Thumper":"Bambi","Pinocchio":"Pinocchio","Jiminy Cricket":"Pinocchio",
+"Cruella de Vil":"101 Dalmatians","Stitch":"Lilo & Stitch","Lilo":"Lilo & Stitch",
+"Woody":"Toy Story","Buzz Lightyear":"Toy Story","Mr. Potato Head":"Toy Story",
+"Remy":"Ratatouille","Lightning McQueen":"Cars","Mater":"Cars",
+"Sulley":"Monsters, Inc.","Mike Wazowski":"Monsters, Inc.","Boo":"Monsters, Inc.",
+"Mr. Incredible":"The Incredibles","Elastigirl":"The Incredibles","Edna Mode":"The Incredibles",
+"Baymax":"Big Hero 6","Judy Hopps":"Zootopia","Nick Wilde":"Zootopia","Mirabel":"Encanto","Dug":"Up","Russell":"Up"
+};
 
 /* ---------- HELPERS ---------- */
 const $=s=>document.querySelector(s);
@@ -380,7 +592,7 @@ const BUILD={
       const cand=CHARS.filter(c=>!G.used.has('c'+c)&&!S.bad.includes(c)); if(!cand.length)return null;
       const c=cand[rnd(cand.length)]; G.used.add('c'+c);
       const img=await fetchCharImage(c); if(!img)continue;
-      return{type:'char',prompt:'Who is this character?',img,...mk(c,CHARS),reveal:c};
+      return{type:'char',prompt:'Who is this character?',img,...mk(c,CHARS),reveal:c,charName:c};
     }
     return null;
   },
@@ -395,6 +607,61 @@ const BUILD={
     return{type:'text',prompt:'Trivia',text:t[0],...mk(t[1],t[2]),reveal:t[1]};
   }
 };
+
+const root=t=>norm(t).replace(/^the /,'').split(' ')[0];
+const movieTitles=()=>MOVIES.map(m=>m[0]);
+BUILD.first=async()=>{
+  if(Math.random()<.5){
+    for(let a=0;a<40;a++){
+      const [x,y]=pick(MOVIES,2); if(Math.abs(x[1]-y[1])<3)continue;
+      const k='f'+[x[0],y[0]].sort().join('|'); if(G.used.has(k))continue; G.used.add(k);
+      const f=x[1]<y[1]?x:y, l=x[1]<y[1]?y:x, options=shuffle([x[0],y[0]]);
+      return{type:'first',prompt:'Which came out first?',text:'Two movies. Which one hit theaters first?',options,answer:options.indexOf(f[0]),reveal:f[0]+' ('+f[1]+') came before '+l[0]+' ('+l[1]+')'};
+    }
+  }
+  for(let a=0;a<60;a++){
+    const four=pick(MOVIES,4); if(new Set(four.map(m=>m[1])).size<4)continue;
+    const sorted=[...four].sort((p,q)=>p[1]-q[1]), wantFirst=Math.random()<.5;
+    const t=wantFirst?sorted[0]:sorted[3], n=wantFirst?sorted[1]:sorted[2]; if(Math.abs(t[1]-n[1])<2)continue;
+    const options=shuffle(four.map(m=>m[0]));
+    return{type:'first',prompt:wantFirst?'Which came out FIRST?':'Which came out LAST?',text:wantFirst?'Which of these movies is the oldest?':'Which of these movies is the newest?',options,answer:options.indexOf(t[0]),reveal:sorted.map(m=>m[0]+' '+m[1]).join(' · ')};
+  }
+  return null;
+};
+BUILD.plot=async()=>{
+  const cand=PLOTS.filter(p=>!G.used.has('p'+p[0])); if(!cand.length)return null;
+  const p=cand[rnd(cand.length)]; G.used.add('p'+p[0]);
+  const m=mk(p[1],movieTitles().filter(t=>t===p[1]||root(t)!==root(p[1])));
+  return{type:'plot',prompt:'Name the movie',text:p[0],...m,reveal:p[1]};
+};
+function oddSets(){
+  const sets=ODD.map(o=>({cat:o[0],mem:o[1],odd:o[2]}));
+  const pix=MOVIES.filter(m=>m[2]).map(m=>m[0]), non=MOVIES.filter(m=>!m[2]).map(m=>m[0]);
+  sets.push({cat:'Pixar movies',mem:pix,odd:non});
+  for(const d of [1990,2000,2010,2020]){
+    const mem=MOVIES.filter(m=>m[1]>=d&&m[1]<d+10).map(m=>m[0]);
+    const out=MOVIES.filter(m=>m[1]<d-3||m[1]>=d+13).map(m=>m[0]);
+    sets.push({cat:'movies released in the '+d+'s',mem,odd:out});
+  }
+  return sets;
+}
+BUILD.odd=async()=>{
+  const all=oddSets(); let cand=all.filter(s=>!G.used.has('o'+s.cat)); if(!cand.length){all.forEach(s=>G.used.delete('o'+s.cat));cand=all}
+  const s=cand[rnd(cand.length)]; G.used.add('o'+s.cat);
+  const three=pick(s.mem,3), o=pick(s.odd,1)[0], options=shuffle([...three,o]);
+  return{type:'odd',prompt:"Which one doesn't belong?",text:'Three of these are '+s.cat+'. Which one is NOT?',options,answer:options.indexOf(o),reveal:o+' is not one of the '+s.cat};
+};
+BUILD.c2m=async()=>{
+  for(let a=0;a<6;a++){
+    const names=Object.keys(CHARMOVIE).filter(c=>!G.used.has('c'+c)&&!S.bad.includes(c)); if(!names.length)return null;
+    const c=names[rnd(names.length)]; G.used.add('c'+c);
+    const img=await fetchCharImage(c); if(!img)continue;
+    const ans=CHARMOVIE[c], m=mk(ans,movieTitles().filter(t=>t===ans||root(t)!==root(ans)));
+    return{type:'c2m',prompt:'Which movie is this character from?',img,...m,reveal:c+' — '+ans,charName:c};
+  }
+  return null;
+};
+
 async function makeQuestion(){
   let order=shuffle(Object.keys(G.types).filter(k=>G.types[k]));
   if(order.length>1&&G.lastType){order=order.filter(k=>k!==G.lastType).concat(order.filter(k=>k===G.lastType))}
@@ -403,15 +670,17 @@ async function makeQuestion(){
 }
 
 /* ---------- SETTINGS / SETUP ---------- */
-let S={players:['Player 1'],total:10,types:{song:1,char:1,emoji:1,text:1},bad:[]};
+let S={players:['Player 1'],total:10,types:{song:1,char:1,emoji:1,text:1,first:1,plot:1,odd:1,c2m:1},bad:[]};
 try{const x=JSON.parse(localStorage.getItem('ouaq')||'null');if(x&&x.players)S=Object.assign(S,x)}catch(e){}
+for(const k of ['song','char','emoji','text','first','plot','odd','c2m'])if(S.types[k]===undefined)S.types[k]=1;
+if(!Array.isArray(S.bad))S.bad=[];
 const save=()=>{try{localStorage.setItem('ouaq',JSON.stringify(S))}catch(e){}};
 let G={};
 const audio=new Audio(); audio.preload='auto';
 
 function showSetup(){
   const names=S.players.map((p,i)=>`<div class="row"><input value="${esc(p)}" maxlength="14" oninput="S.players[${i}]=this.value">${S.players.length>1?`<button class="x" onclick="rmP(${i})">✕</button>`:''}</div>`).join('');
-  const chips=[['song','🎵 Songs'],['char','🖼️ Characters'],['emoji','🧩 Emoji'],['text','❓ Trivia']].map(([k,l])=>`<button class="chip ${S.types[k]?'on':''}" onclick="tg('${k}')">${l}</button>`).join('');
+  const chips=[['song','🎵 Songs'],['char','🖼️ Who is it?'],['c2m','🎬 Character → Movie'],['emoji','🧩 Emoji'],['text','❓ Trivia'],['plot','📖 Plot clues'],['first','📅 Which came first'],['odd','🎯 Odd one out']].map(([k,l])=>`<button class="chip ${S.types[k]?'on':''}" onclick="tg('${k}')">${l}</button>`).join('');
   view(`<h1>✨ Once Upon a Quiz</h1><p class="sub">Pass-the-phone Disney trivia</p>
   <div class="card"><div class="lbl">Questions</div><div class="step"><button onclick="setN(-5)">−</button><b>${S.total}</b><button onclick="setN(5)">+</button><span class="hint" style="margin-left:auto">5–50</span></div></div>
   <div class="card"><div class="lbl">Question types</div><div class="chips">${chips}</div></div>
@@ -445,7 +714,7 @@ function beginQ(){
   G.done=false;G.plays=0;
   let stage='';
   if(q.type==='song')stage=`<div class="stage song"><button class="bigplay" onclick="replay()">▶</button><div class="bar"><i id="bar"></i></div></div><p class="hint" id="ph">Plays 5 seconds · each replay costs points</p>`;
-  else if(q.type==='char')stage=`<div class="stage zoom"><img id="zi" src="${esc(q.img)}" alt="" referrerpolicy="no-referrer"></div><p class="hint">It zooms out — guess early for more points</p>`;
+  else if((q.type==='char'||q.type==='c2m'))stage=`<div class="stage zoom"><img id="zi" src="${esc(q.img)}" alt="" referrerpolicy="no-referrer"></div><p class="hint">It zooms out — guess early for more points</p>`;
   else if(q.type==='emoji')stage=`<div class="stage emo">${q.emoji}</div>`;
   else stage=`<div class="stage txt">${esc(q.text)}</div>`;
   view(`<div class="top"><span>Question ${G.idx+1}/${G.total}</span><span>${esc(p.name)} · ${p.score} pts</span></div>
@@ -453,7 +722,7 @@ function beginQ(){
   <div class="choices">${q.options.map((o,i)=>`<button class="opt" onclick="answer(${i})">${esc(o)}</button>`).join('')}</div>
   <div id="after"></div>`);
   if(q.type==='song'){audio.src=q.audio;playClip()}
-  if(q.type==='char')startZoom();
+  if((q.type==='char'||q.type==='c2m'))startZoom();
   if(G.idx+1<G.total)G.pre=makeQuestion();
 }
 function playClip(){
@@ -487,16 +756,16 @@ function answer(i){
   if(ok){
     pts=100;
     if(q.type==='song')pts=Math.max(40,100-20*(G.plays-1));
-    if(q.type==='char')pts=Math.round(100-60*(G.zp||0));
+    if((q.type==='char'||q.type==='c2m'))pts=Math.round(100-60*(G.zp||0));
     p.score+=pts;
   }
   const zi=$('#zi');if(zi){zi.style.transition='transform .6s';zi.style.transform='scale(1)'}
   document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(j===q.answer)b.classList.add('ok');else if(j===i)b.classList.add('bad')});
   const last=G.idx+1>=G.total;
   $('#after').innerHTML=`<p class="reveal">${ok?`✅ Correct! <b>+${pts}</b>`:'❌ Nope'}<br><b>${esc(q.reveal)}</b></p>
-  <button class="big" onclick="nextQ()">${last?'See results':'Next question'}</button>${q.type==='char'?'<button class="ghost" id="flag" onclick="flagBad()">🚩 Bad picture — never show this one again</button>':''}`;
+  <button class="big" onclick="nextQ()">${last?'See results':'Next question'}</button>${(q.type==='char'||q.type==='c2m')?'<button class="ghost" id="flag" onclick="flagBad()">🚩 Bad picture — never show this one again</button>':''}`;
 }
-function flagBad(){const n=G.q&&G.q.reveal;if(n&&!S.bad.includes(n)){S.bad.push(n);save()}const b=$('#flag');if(b){b.textContent='Hidden ✓';b.disabled=true}}
+function flagBad(){const n=G.q&&(G.q.charName||G.q.reveal);if(n&&!S.bad.includes(n)){S.bad.push(n);save()}const b=$('#flag');if(b){b.textContent='Hidden ✓';b.disabled=true}}
 function nextQ(){G.idx++;if(G.idx>=G.total)showResults();else advance()}
 function showResults(){
   const r=[...G.players].sort((a,b)=>b.score-a.score);
