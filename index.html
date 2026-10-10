@@ -183,7 +183,7 @@ const norm=s=>String(s).toLowerCase().replace(/\(.*?\)/g,' ').replace(/[’']/g,
 const view=h=>{app.innerHTML=h;window.scrollTo(0,0)};
 function fetchT(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).then(r=>{if(!r.ok)throw new Error('http '+r.status);return r}).finally(()=>clearTimeout(t))}
 function jsonp(url,ms=7000){return new Promise((res,rej)=>{const cb='cb'+Date.now()+rnd(1e6);const s=document.createElement('script');const t=setTimeout(()=>{clean();rej(new Error('timeout'))},ms);function clean(){clearTimeout(t);delete window[cb];s.remove()}window[cb]=d=>{clean();res(d)};s.onerror=()=>{clean();rej(new Error('jsonp'))};s.src=url+'&callback='+cb;document.head.appendChild(s)})}
-function preload(src){return new Promise((res,rej)=>{const im=new Image();const t=setTimeout(()=>rej(new Error('t')),9000);im.onload=()=>{clearTimeout(t);im.naturalWidth<120?rej(new Error('small')):res(im)};im.onerror=()=>{clearTimeout(t);rej(new Error('err'))};im.src=src})}
+function preload(src){return new Promise((res,rej)=>{const im=new Image();im.referrerPolicy='no-referrer';const t=setTimeout(()=>rej(new Error('t')),9000);im.onload=()=>{clearTimeout(t);im.naturalWidth<120?rej(new Error('small')):res(im)};im.onerror=()=>{clearTimeout(t);rej(new Error('err'))};im.src=src})}
 function mk(correct,pool){const wrong=pick([...new Set(pool)].filter(x=>x!==correct),3);const options=shuffle([correct,...wrong]);return{options,answer:options.indexOf(correct)}}
 
 /* ---------- CONTENT FETCHERS ---------- */
@@ -237,22 +237,33 @@ async function findPreview(title,movie){
   if(best||answered)songCache.set(key,best);
   return best;
 }
+async function wikiImage(name){
+  const e=encodeURIComponent, first=norm(name).split(' ')[0];
+  const s=await (await fetchT('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+e(name+' Disney character')+'&srlimit=4&format=json&origin=*',7000)).json();
+  for(const h of (s.query&&s.query.search)||[]){
+    if(/film|soundtrack|album|series|video game|franchise|list of|season/i.test(h.title))continue;
+    if(!norm(h.title).includes(first))continue;
+    try{
+      const r=await (await fetchT('https://en.wikipedia.org/api/rest_v1/page/summary/'+e(h.title.replace(/ /g,'_')),7000)).json();
+      let src=r.thumbnail&&r.thumbnail.source;
+      if(src&&r.originalimage&&r.originalimage.width>=960&&/\/\d+px-/.test(src))src=src.replace(/\/\d+px-/,'/960px-');
+      else if(r.originalimage&&r.originalimage.width<960)src=r.originalimage.source;
+      if(src){await preload(src);return src}
+    }catch(err){}
+  }
+  return null;
+}
+async function fandomImage(name){
+  const u='https://disney.fandom.com/api.php?action=query&redirects=1&titles='+encodeURIComponent(name)+'&prop=pageimages&pithumbsize=800&format=json&origin=*';
+  const j=await (await fetchT(u,7000)).json(); const pages=j.query&&j.query.pages;
+  if(pages){for(const k in pages){const t=pages[k].thumbnail; if(t&&t.source){await preload(t.source);return t.source}}}
+  return null;
+}
 async function fetchCharImage(name){
   if(imgCache.has(name))return imgCache.get(name);
-  const e=encodeURIComponent;
-  const urls=[
-   'https://disney.fandom.com/api.php?action=query&redirects=1&titles='+e(name)+'&prop=pageimages&pithumbsize=800&format=json&origin=*',
-   'https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+e(name+' Disney character')+'&gsrlimit=1&prop=pageimages&pithumbsize=800&format=json&origin=*'
-  ];
   let found=null;
-  for(const u of urls){
-    try{
-      const j=await (await fetchT(u,7000)).json(); const pages=j.query&&j.query.pages;
-      if(pages){for(const k in pages){const t=pages[k].thumbnail; if(t&&t.source){found=t.source;break}}}
-      if(found){try{await preload(found)}catch(e){found=null}}
-      if(found)break;
-    }catch(e){}
-  }
+  try{found=await wikiImage(name)}catch(e){}
+  if(!found){try{found=await fandomImage(name)}catch(e){}}
   imgCache.set(name,found); return found;
 }
 
@@ -340,7 +351,7 @@ function beginQ(){
   G.done=false;G.plays=0;
   let stage='';
   if(q.type==='song')stage=`<div class="stage song"><button class="bigplay" onclick="replay()">▶</button><div class="bar"><i id="bar"></i></div></div><p class="hint" id="ph">Plays 5 seconds · each replay costs points</p>`;
-  else if(q.type==='char')stage=`<div class="stage zoom"><img id="zi" src="${esc(q.img)}" alt=""></div><p class="hint">It zooms out — guess early for more points</p>`;
+  else if(q.type==='char')stage=`<div class="stage zoom"><img id="zi" src="${esc(q.img)}" alt="" referrerpolicy="no-referrer"></div><p class="hint">It zooms out — guess early for more points</p>`;
   else if(q.type==='emoji')stage=`<div class="stage emo">${q.emoji}</div>`;
   else stage=`<div class="stage txt">${esc(q.text)}</div>`;
   view(`<div class="top"><span>Question ${G.idx+1}/${G.total}</span><span>${esc(p.name)} · ${p.score} pts</span></div>
@@ -416,6 +427,7 @@ async function runTest(full,skipChars){
   view(`<div class="card"><h2>Results</h2>
   ${skipChars?'':`<p>🖼️ Characters with images: <b>${okC}/${CHARS.length}</b></p>${badC.length?`<pre>Missing: ${esc(badC.join(', '))}</pre>`:''}`}
   <p>🎵 Songs with previews: <b>${okS}/${songs.length}</b>${full?'':' (sample)'}</p>${badS.length?`<pre>Missing: ${esc(badS.join(', '))}</pre>`:''}
+  ${skipChars?'':`<div class="lbl">Sample images</div><div style="display:flex;flex-wrap:wrap;gap:8px">${pick(CHARS.filter(c=>imgCache.get(c)),6).map(c=>`<div style="width:31%;text-align:center;font-size:12px"><img src="${esc(imgCache.get(c))}" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:1;object-fit:contain;background:#2a2060;border-radius:8px"><br>${esc(c)}</div>`).join('')}</div>`}
   ${okS<songs.length?`<div class="lbl">Diagnostics</div><pre>${esc(dg)}</pre>`:''}
   <p class="hint">Missing items are skipped automatically during games.</p></div>
   <button class="big" onclick="runTest(true,true)">Check ALL songs (~2 min)</button>
