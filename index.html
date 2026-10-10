@@ -82,13 +82,105 @@ const SONGS=[
 ];
 
 // character names (looked up on wikis at play time)
-const CHARS=["Mickey Mouse","Minnie Mouse","Donald Duck","Goofy","Pluto","Simba","Nala","Scar","Mufasa","Timon","Pumbaa","Rafiki",
-"Elsa","Anna","Olaf","Kristoff","Moana","Maui","Ariel","Ursula","Sebastian","Flounder","Belle","Beast","Gaston","Cinderella","Aurora","Maleficent",
-"Snow White","Rapunzel","Flynn Rider","Mulan","Mushu","Jasmine","Aladdin","Genie","Jafar","Abu","Pocahontas","Tiana","Merida","Hercules","Hades",
-"Megara","Tarzan","Baloo","Mowgli","Bagheera","Shere Khan","King Louie","Winnie the Pooh","Tigger","Eeyore","Piglet","Peter Pan","Tinker Bell",
-"Captain Hook","Cheshire Cat","Mad Hatter","Queen of Hearts","Dumbo","Bambi","Thumper","Pinocchio","Jiminy Cricket","Cruella de Vil","Stitch","Lilo",
-"Woody","Buzz Lightyear","Mr. Potato Head","Nemo","Dory","Marlin","Remy","Lightning McQueen","Mater","Sulley","Mike Wazowski","Boo","Mr. Incredible",
-"Elastigirl","Edna Mode","Baymax","Judy Hopps","Nick Wilde","Mirabel","Dug","Russell","Hei Hei","Iago","Zazu","Timothy Q. Mouse","Mother Gothel","Hans"];
+// character name -> movie/context used to find the right wiki page
+const CHARDATA={
+"Mickey Mouse":"Disney",
+"Minnie Mouse":"Disney",
+"Donald Duck":"Disney",
+"Goofy":"Disney",
+"Pluto":"Disney dog",
+"Simba":"The Lion King",
+"Nala":"The Lion King",
+"Scar":"The Lion King",
+"Mufasa":"The Lion King",
+"Timon":"The Lion King",
+"Pumbaa":"The Lion King",
+"Rafiki":"The Lion King",
+"Zazu":"The Lion King",
+"Elsa":"Frozen",
+"Anna":"Frozen",
+"Olaf":"Frozen",
+"Kristoff":"Frozen",
+"Hans":"Frozen",
+"Moana":"Moana",
+"Maui":"Moana",
+"Hei Hei":"Moana",
+"Ariel":"The Little Mermaid",
+"Ursula":"The Little Mermaid",
+"Sebastian":"The Little Mermaid",
+"Flounder":"The Little Mermaid",
+"Belle":"Beauty and the Beast",
+"Beast":"Beauty and the Beast",
+"Gaston":"Beauty and the Beast",
+"Cinderella":"Disney",
+"Aurora":"Sleeping Beauty",
+"Maleficent":"Sleeping Beauty",
+"Snow White":"Snow White and the Seven Dwarfs",
+"Rapunzel":"Tangled",
+"Flynn Rider":"Tangled",
+"Mother Gothel":"Tangled",
+"Mulan":"Mulan",
+"Mushu":"Mulan",
+"Jasmine":"Aladdin",
+"Aladdin":"Aladdin",
+"Genie":"Aladdin",
+"Jafar":"Aladdin",
+"Abu":"Aladdin",
+"Iago":"Aladdin",
+"Pocahontas":"Disney",
+"Tiana":"The Princess and the Frog",
+"Merida":"Brave",
+"Hercules":"Disney",
+"Hades":"Hercules",
+"Megara":"Hercules",
+"Tarzan":"Disney",
+"Baloo":"The Jungle Book",
+"Mowgli":"The Jungle Book",
+"Bagheera":"The Jungle Book",
+"Shere Khan":"The Jungle Book",
+"King Louie":"The Jungle Book",
+"Winnie the Pooh":"Disney",
+"Tigger":"Winnie the Pooh",
+"Eeyore":"Winnie the Pooh",
+"Piglet":"Winnie the Pooh",
+"Peter Pan":"Disney",
+"Tinker Bell":"Peter Pan",
+"Captain Hook":"Peter Pan",
+"Cheshire Cat":"Alice in Wonderland",
+"Mad Hatter":"Alice in Wonderland",
+"Queen of Hearts":"Alice in Wonderland",
+"Dumbo":"Disney",
+"Timothy Q. Mouse":"Dumbo",
+"Bambi":"Disney",
+"Thumper":"Bambi",
+"Pinocchio":"Disney",
+"Jiminy Cricket":"Pinocchio",
+"Cruella de Vil":"101 Dalmatians",
+"Stitch":"Lilo & Stitch",
+"Lilo":"Lilo & Stitch",
+"Woody":"Toy Story",
+"Buzz Lightyear":"Toy Story",
+"Mr. Potato Head":"Toy Story",
+"Nemo":"Finding Nemo",
+"Dory":"Finding Nemo",
+"Marlin":"Finding Nemo",
+"Remy":"Ratatouille",
+"Lightning McQueen":"Cars",
+"Mater":"Cars",
+"Sulley":"Monsters, Inc.",
+"Mike Wazowski":"Monsters, Inc.",
+"Boo":"Monsters, Inc.",
+"Mr. Incredible":"The Incredibles",
+"Elastigirl":"The Incredibles",
+"Edna Mode":"The Incredibles",
+"Baymax":"Big Hero 6",
+"Judy Hopps":"Zootopia",
+"Nick Wilde":"Zootopia",
+"Mirabel":"Encanto",
+"Dug":"Up",
+"Russell":"Up"
+};
+const CHARS=Object.keys(CHARDATA);
 
 // [emoji, title]
 const EMOJI=[
@@ -239,12 +331,14 @@ async function findPreview(title,movie){
 }
 async function wikiImage(name){
   const e=encodeURIComponent, first=norm(name).split(' ')[0];
-  const s=await (await fetchT('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+e(name+' Disney character')+'&srlimit=4&format=json&origin=*',7000)).json();
+  const s=await (await fetchT('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+e(name+' '+(CHARDATA[name]||'Disney')+' character')+'&srlimit=4&format=json&origin=*',7000)).json();
   for(const h of (s.query&&s.query.search)||[]){
     if(/film|soundtrack|album|series|video game|franchise|list of|season/i.test(h.title))continue;
     if(!norm(h.title).includes(first))continue;
     try{
       const r=await (await fetchT('https://en.wikipedia.org/api/rest_v1/page/summary/'+e(h.title.replace(/ /g,'_')),7000)).json();
+      const desc=(r.description||'')+' '+(r.extract||'');
+      if(!/fictional|character|animated|disney|pixar|cartoon|mascot/i.test(desc)||/\b(born \d|is an american|was an american)\b/i.test(desc))continue;
       let src=r.thumbnail&&r.thumbnail.source;
       if(src&&r.originalimage&&r.originalimage.width>=960&&/\/\d+px-/.test(src))src=src.replace(/\/\d+px-/,'/960px-');
       else if(r.originalimage&&r.originalimage.width<960)src=r.originalimage.source;
@@ -283,7 +377,7 @@ const BUILD={
   },
   async char(){
     for(let a=0;a<6;a++){
-      const cand=CHARS.filter(c=>!G.used.has('c'+c)); if(!cand.length)return null;
+      const cand=CHARS.filter(c=>!G.used.has('c'+c)&&!S.bad.includes(c)); if(!cand.length)return null;
       const c=cand[rnd(cand.length)]; G.used.add('c'+c);
       const img=await fetchCharImage(c); if(!img)continue;
       return{type:'char',prompt:'Who is this character?',img,...mk(c,CHARS),reveal:c};
@@ -309,7 +403,7 @@ async function makeQuestion(){
 }
 
 /* ---------- SETTINGS / SETUP ---------- */
-let S={players:['Player 1'],total:10,types:{song:1,char:1,emoji:1,text:1}};
+let S={players:['Player 1'],total:10,types:{song:1,char:1,emoji:1,text:1},bad:[]};
 try{const x=JSON.parse(localStorage.getItem('ouaq')||'null');if(x&&x.players)S=Object.assign(S,x)}catch(e){}
 const save=()=>{try{localStorage.setItem('ouaq',JSON.stringify(S))}catch(e){}};
 let G={};
@@ -400,8 +494,9 @@ function answer(i){
   document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(j===q.answer)b.classList.add('ok');else if(j===i)b.classList.add('bad')});
   const last=G.idx+1>=G.total;
   $('#after').innerHTML=`<p class="reveal">${ok?`✅ Correct! <b>+${pts}</b>`:'❌ Nope'}<br><b>${esc(q.reveal)}</b></p>
-  <button class="big" onclick="nextQ()">${last?'See results':'Next question'}</button>`;
+  <button class="big" onclick="nextQ()">${last?'See results':'Next question'}</button>${q.type==='char'?'<button class="ghost" id="flag" onclick="flagBad()">🚩 Bad picture — never show this one again</button>':''}`;
 }
+function flagBad(){const n=G.q&&G.q.reveal;if(n&&!S.bad.includes(n)){S.bad.push(n);save()}const b=$('#flag');if(b){b.textContent='Hidden ✓';b.disabled=true}}
 function nextQ(){G.idx++;if(G.idx>=G.total)showResults();else advance()}
 function showResults(){
   const r=[...G.players].sort((a,b)=>b.score-a.score);
@@ -427,7 +522,7 @@ async function runTest(full,skipChars){
   view(`<div class="card"><h2>Results</h2>
   ${skipChars?'':`<p>🖼️ Characters with images: <b>${okC}/${CHARS.length}</b></p>${badC.length?`<pre>Missing: ${esc(badC.join(', '))}</pre>`:''}`}
   <p>🎵 Songs with previews: <b>${okS}/${songs.length}</b>${full?'':' (sample)'}</p>${badS.length?`<pre>Missing: ${esc(badS.join(', '))}</pre>`:''}
-  ${skipChars?'':`<div class="lbl">Sample images</div><div style="display:flex;flex-wrap:wrap;gap:8px">${pick(CHARS.filter(c=>imgCache.get(c)),6).map(c=>`<div style="width:31%;text-align:center;font-size:12px"><img src="${esc(imgCache.get(c))}" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:1;object-fit:contain;background:#2a2060;border-radius:8px"><br>${esc(c)}</div>`).join('')}</div>`}
+  ${skipChars?'':`<div class="lbl">Sample images</div><div style="display:flex;flex-wrap:wrap;gap:8px">${pick(CHARS.filter(c=>imgCache.get(c)),9).map(c=>`<div style="width:31%;text-align:center;font-size:12px"><img src="${esc(imgCache.get(c))}" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:1;object-fit:contain;background:#2a2060;border-radius:8px"><br>${esc(c)}</div>`).join('')}</div>`}
   ${okS<songs.length?`<div class="lbl">Diagnostics</div><pre>${esc(dg)}</pre>`:''}
   <p class="hint">Missing items are skipped automatically during games.</p></div>
   <button class="big" onclick="runTest(true,true)">Check ALL songs (~2 min)</button>
