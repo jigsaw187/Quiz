@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Once Upon a Quiz">
+<meta name="theme-color" content="#1b1446">
+<title>Once Upon a Quiz</title>
+<style>
+:root{--bg:#1b1446;--card:#2a2064;--card2:#372b80;--ink:#f6f2ff;--dim:#b9b0e6;--gold:#ffd66b;--ok:#38c172;--bad:#e5484d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:radial-gradient(circle at 50% 0%,#3a2a9a 0%,var(--bg) 60%) fixed;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100%}
+#app{max-width:520px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+h1{font-size:30px;margin:8px 0 2px;text-align:center;color:var(--gold);letter-spacing:.5px}
+h2{font-size:22px;margin:10px 0}
+.sub{text-align:center;color:var(--dim);margin:0 0 18px}
+.card{background:var(--card);border-radius:18px;padding:16px;margin:12px 0}
+.lbl{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:8px}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--card2);padding:10px 14px;border-radius:999px;opacity:.55}
+.chip.on{opacity:1;background:#5a46d6;box-shadow:0 0 0 2px var(--gold) inset}
+.row{display:flex;gap:8px;margin-bottom:8px}
+input{flex:1;font:inherit;padding:12px;border-radius:12px;border:0;background:#1b1446;color:var(--ink);min-width:0}
+.x{background:var(--card2);width:44px;border-radius:12px}
+.step{display:flex;align-items:center;gap:14px}
+.step button{width:46px;height:46px;border-radius:50%;background:var(--card2);font-size:22px}
+.step b{font-size:26px;min-width:44px;text-align:center}
+.big{width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#ffcf5c,#ff9d3d);color:#2a1a00;font-weight:700;font-size:18px;margin-top:10px}
+.big:disabled{opacity:.5}
+.ghost{width:100%;padding:12px;border-radius:14px;background:var(--card2);margin-top:8px}
+.top{display:flex;justify-content:space-between;color:var(--dim);font-size:14px;margin-bottom:4px}
+.stage{background:#0e0a2b;border-radius:20px;margin:10px 0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.stage.zoom{aspect-ratio:1;overflow:hidden;background:#2a2060}
+.stage.zoom img{width:100%;height:100%;object-fit:contain;will-change:transform}
+.stage.emo{font-size:64px;padding:28px 10px;letter-spacing:6px;text-align:center}
+.stage.txt{font-size:21px;padding:26px 18px;text-align:center;line-height:1.35}
+.stage.song{padding:22px}
+.bigplay{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#ffcf5c,#ff9d3d);font-size:38px;color:#2a1a00}
+.bar{width:100%;height:8px;background:#2a2064;border-radius:8px;margin-top:18px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--gold)}
+.hint{text-align:center;color:var(--dim);font-size:13px;margin:6px 0}
+.choices{display:grid;gap:10px;margin-top:10px}
+.opt{background:var(--card);padding:15px;border-radius:14px;text-align:left;font-size:17px;border:2px solid transparent}
+.opt.ok{background:#175c36;border-color:var(--ok)}
+.opt.bad{background:#6b1d20;border-color:var(--bad)}
+.opt:disabled{opacity:1}
+.reveal{text-align:center;margin:12px 0 0;font-size:17px}
+.reveal b{color:var(--gold)}
+.score{display:flex;justify-content:space-between;padding:12px 4px;border-bottom:1px solid #ffffff22;font-size:19px}
+.center{text-align:center}
+pre{white-space:pre-wrap;font-size:13px;color:var(--dim)}
+.spin{font-size:44px;animation:s 1.2s linear infinite;display:inline-block}
+@keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ---------- DATA ---------- */
+// [song title, movie]
+const SONGS=[
+["Let It Go","Frozen"],["Do You Want to Build a Snowman?","Frozen"],["Into the Unknown","Frozen II"],
+["Under the Sea","The Little Mermaid"],["Part of Your World","The Little Mermaid"],["Kiss the Girl","The Little Mermaid"],["Poor Unfortunate Souls","The Little Mermaid"],
+["A Whole New World","Aladdin"],["Friend Like Me","Aladdin"],["Prince Ali","Aladdin"],["One Jump Ahead","Aladdin"],
+["Circle of Life","The Lion King"],["Hakuna Matata","The Lion King"],["Can You Feel the Love Tonight","The Lion King"],["Be Prepared","The Lion King"],["I Just Can't Wait to Be King","The Lion King"],
+["Be Our Guest","Beauty and the Beast"],["Belle","Beauty and the Beast"],["Gaston","Beauty and the Beast"],["Tale as Old as Time","Beauty and the Beast"],
+["How Far I'll Go","Moana"],["You're Welcome","Moana"],["Shiny","Moana"],
+["We Don't Talk About Bruno","Encanto"],["Surface Pressure","Encanto"],["What Else Can I Do?","Encanto"],["Dos Oruguitas","Encanto"],
+["Remember Me","Coco"],["Bibbidi-Bobbidi-Boo","Cinderella"],["A Dream Is a Wish Your Heart Makes","Cinderella"],
+["Colors of the Wind","Pocahontas"],["Just Around the Riverbend","Pocahontas"],
+["Reflection","Mulan"],["I'll Make a Man Out of You","Mulan"],
+["You've Got a Friend in Me","Toy Story"],["When You Wish Upon a Star","Pinocchio"],
+["Zero to Hero","Hercules"],["Go the Distance","Hercules"],["Almost There","The Princess and the Frog"],
+["I See the Light","Tangled"],["When Will My Life Begin","Tangled"],
+["Heigh-Ho","Snow White and the Seven Dwarfs"],["Some Day My Prince Will Come","Snow White and the Seven Dwarfs"],
+["Supercalifragilisticexpialidocious","Mary Poppins"],["Chim Chim Cher-ee","Mary Poppins"],
+["The Bare Necessities","The Jungle Book"],["I Wan'na Be Like You","The Jungle Book"],
+["Strangers Like Me","Tarzan"],["You'll Be in My Heart","Tarzan"],
+["Once Upon a Dream","Sleeping Beauty"],["Cruella de Vil","101 Dalmatians"],["Out There","The Hunchback of Notre Dame"],["Try Everything","Zootopia"]
+];
+
+// character names (looked up on wikis at play time)
+const CHARS=["Mickey Mouse","Minnie Mouse","Donald Duck","Goofy","Pluto","Simba","Nala","Scar","Mufasa","Timon","Pumbaa","Rafiki",
+"Elsa","Anna","Olaf","Kristoff","Moana","Maui","Ariel","Ursula","Sebastian","Flounder","Belle","Beast","Gaston","Cinderella","Aurora","Maleficent",
+"Snow White","Rapunzel","Flynn Rider","Mulan","Mushu","Jasmine","Aladdin","Genie","Jafar","Abu","Pocahontas","Tiana","Merida","Hercules","Hades",
+"Megara","Tarzan","Baloo","Mowgli","Bagheera","Shere Khan","King Louie","Winnie the Pooh","Tigger","Eeyore","Piglet","Peter Pan","Tinker Bell",
+"Captain Hook","Cheshire Cat","Mad Hatter","Queen of Hearts","Dumbo","Bambi","Thumper","Pinocchio","Jiminy Cricket","Cruella de Vil","Stitch","Lilo",
+"Woody","Buzz Lightyear","Mr. Potato Head","Nemo","Dory","Marlin","Remy","Lightning McQueen","Mater","Sulley","Mike Wazowski","Boo","Mr. Incredible",
+"Elastigirl","Edna Mode","Baymax","Judy Hopps","Nick Wilde","Mirabel","Dug","Russell","Hei Hei","Iago","Zazu","Timothy Q. Mouse","Mother Gothel","Hans"];
+
+// [emoji, title]
+const EMOJI=[
+["🧞🪔🐒","Aladdin"],["❄️👸⛄","Frozen"],["🦁👑🌅","The Lion King"],["🧜‍♀️🐚🦀","The Little Mermaid"],["🐠🔍🌊","Finding Nemo"],
+["🤠🚀🧸","Toy Story"],["🌹🕰️☕","Beauty and the Beast"],["🐘🪶🎪","Dumbo"],["🧚‍♀️🏴‍☠️🐊","Peter Pan"],["🍎👸🪞","Snow White"],
+["🐀👨‍🍳🧀","Ratatouille"],["🤖🌱🚀","WALL-E"],["🎈🏠🐕","Up"],["👹👁️🚪","Monsters, Inc."],["💀🎸🌼","Coco"],
+["🌊🐓🔱","Moana"],["🐉⚔️🌸","Mulan"],["🐻🍯🎈","Winnie the Pooh"],["🏎️⚡🏁","Cars"],["🦸‍♂️👨‍👩‍👧‍👦💥","The Incredibles"],
+["😢😡😊","Inside Out"],["🐵🐻🌴","The Jungle Book"],["👱‍♀️🏮🍳","Tangled"],["🐸👸🎺","The Princess and the Frog"],
+["🐭🎩🧹","Fantasia"],["🦌🌲🐰","Bambi"],["🐕🍝🌙","Lady and the Tramp"],["👠🎃🐭","Cinderella"],["🐇⏰🫖","Alice in Wonderland"],
+["🐼🔴🎤","Turning Red"],["🤖🦸‍♂️🏙️","Big Hero 6"],["🐰👮🦊","Zootopia"],["🌺👽🏝️","Lilo & Stitch"],["🌳🦍🌿","Tarzan"],
+["🎃💀🎄","The Nightmare Before Christmas"],["🏠🕯️🦋","Encanto"],["⚡🐴🏛️","Hercules"],["🥀😴🐉","Sleeping Beauty"],["🪵👦🦗","Pinocchio"]
+];
+
+// [question, correct, [3 wrong]]
+const TEXT=[
+["Which was the first full-length animated Disney feature film?","Snow White and the Seven Dwarfs",["Pinocchio","Fantasia","Bambi"]],
+["What is the name of Cinderella's stepmother?","Lady Tremaine",["Madame Mim","Mother Gothel","Queen Narissa"]],
+["Who owns the toys in Toy Story?","Andy",["Sid","Bonnie","Andrew"]],
+["What is the name of Simba's mother in The Lion King?","Sarabi",["Nala","Sarafina","Zira"]],
+["What is the name of Jasmine's pet tiger?","Rajah",["Abu","Raja Khan","Shere Khan"]],
+["What is the name of Kristoff's reindeer?","Sven",["Hans","Olaf","Bruni"]],
+["Which fish in Finding Nemo has short-term memory loss?","Dory",["Marlin","Gill","Bruce"]],
+["What is the name of the enchanted candelabra in Beauty and the Beast?","Lumière",["Cogsworth","Mrs. Potts","Chip"]],
+["Who is Ariel's crab friend who works for King Triton?","Sebastian",["Flounder","Scuttle","Max"]],
+["What is the name of Moana's home island?","Motunui",["Motu Nui Atoll","Te Fiti","Kauai"]],
+["What is the name of the tiny dragon in Mulan?","Mushu",["Cri-Kee","Khan","Shan Yu"]],
+["What is Rapunzel's chameleon companion called?","Pascal",["Maximus","Flynn","Hamish"]],
+["In what year did Mickey Mouse debut in Steamboat Willie?","1928",["1937","1919","1940"]],
+["Which Disney park opened first?","Disneyland",["Magic Kingdom","Tokyo Disneyland","Disneyland Paris"]],
+["In which state is Disneyland located?","California",["Florida","Nevada","Arizona"]],
+["In what year did Walt Disney World open?","1971",["1955","1982","1966"]],
+["What is the dog's name in Up?","Dug",["Rex","Bolt","Pongo"]],
+["What is the name of the Wilderness Explorer boy in Up?","Russell",["Carl","Charles","Kevin"]],
+["What is the name of the robot WALL-E falls for?","EVE",["AUTO","M-O","MAX"]],
+["Who is Sulley's one-eyed best friend in Monsters, Inc.?","Mike Wazowski",["Randall Boggs","Roz","Boo"]],
+["Which emotion is blue in Inside Out?","Sadness",["Fear","Disgust","Anger"]],
+["Which holiday is the film Coco centered on?","Día de los Muertos",["Cinco de Mayo","Halloween","Carnival"]],
+["What is the family name in Encanto?","Madrigal",["Rivera","Hernández","Montoya"]],
+["Which Madrigal controls the weather with her mood?","Pepa",["Julieta","Luisa","Isabela"]],
+["What is Hercules' winged horse called?","Pegasus",["Phil","Hades","Bucephalus"]],
+["Who is the villain in Hercules?","Hades",["Scar","Jafar","Ursula"]],
+["What is Aladdin's monkey companion called?","Abu",["Iago","Rajah","Genie"]],
+["What is the name of the crocodile that chases Captain Hook?","Tick-Tock",["Snap","Ticker","Clyde"]],
+["What does Alice follow into Wonderland?","The White Rabbit",["The Cheshire Cat","A Blue Caterpillar","The Dormouse"]],
+["What does Princess Aurora prick her finger on?","A spinning wheel",["A rose thorn","A poisoned apple","A needle in a sewing kit"]],
+["What is the name of Pinocchio's cricket conscience?","Jiminy Cricket",["Cri-Kee","Flik","Heimlich"]],
+["What is Stitch's experiment number?","626",["625","627","007"]],
+["What is the last name of the superhero family in The Incredibles?","Parr",["Incredible","Strong","Rogers"]],
+["What number is Lightning McQueen?","95",["57","1","43"]],
+["What kind of animal is Remy in Ratatouille?","A rat",["A mouse","A raccoon","A hamster"]],
+["What is the name of the snowman in Frozen?","Olaf",["Sven","Oswald","Oliver"]],
+["Who is the demigod in Moana?","Maui",["Tamatoa","Tui","Hercules"]],
+["What kind of animal is Judy Hopps in Zootopia?","A rabbit",["A fox","A sheep","A deer"]],
+["What is the name of the inflatable robot in Big Hero 6?","Baymax",["Hiro","Tadashi","Wasabi"]],
+["Who raises Tarzan?","A gorilla named Kala",["A leopard named Sabor","A baboon named Rafiki","A bear named Baloo"]],
+["What is Pocahontas's raccoon friend called?","Meeko",["Flit","Percy","Pumbaa"]],
+["What does Merida use as her weapon in Brave?","A bow and arrow",["A sword","A spear","A slingshot"]],
+["What is the name of Mary Poppins' chimney-sweep friend?","Bert",["Burt Lancaster","Albert","Dick"]],
+["Which bear befriends Mowgli in The Jungle Book?","Baloo",["Winnie","Balto","Kenai"]],
+["In which city is The Princess and the Frog set?","New Orleans",["Savannah","Memphis","Mobile"]],
+["What was the first feature-length Pixar film?","Toy Story",["A Bug's Life","Monsters, Inc.","Finding Nemo"]],
+["In what year did Disney acquire Pixar?","2006",["1995","2001","2012"]],
+["Which company did Disney acquire in 2012?","Lucasfilm",["Marvel","Pixar","DreamWorks"]],
+["What is Belle's father's name?","Maurice",["Gaston","Lefou","Philippe"]],
+["What kind of animal is Rafiki?","A mandrill",["A lion","A meerkat","A warthog"]],
+["What kind of animal is Pumbaa?","A warthog",["A boar","A hyena","A hippo"]],
+["Who is Nemo's father?","Marlin",["Gill","Bruce","Crush"]],
+["What are the names of Cinderella's two mouse friends?","Gus and Jaq",["Chip and Dale","Timothy and Mickey","Pip and Squeak"]],
+["What is the kingdom called in Frozen?","Arendelle",["Corona","Atlantica","Agrabah"]],
+["Who is Rapunzel's captor in Tangled?","Mother Gothel",["Lady Tremaine","Maleficent","Ursula"]],
+["Where does Peter Pan live?","Neverland",["Wonderland","Atlantica","Lost Isle"]],
+["Who are Donald Duck's three nephews?","Huey, Dewey and Louie",["Chip, Dale and Dash","Larry, Moe and Curly","Scrooge, Flintheart and Gladstone"]],
+["Which Disney princess was the first African American Disney princess?","Tiana",["Jasmine","Pocahontas","Mulan"]],
+["What is the name of Mulan's horse?","Khan",["Maximus","Philippe","Bullseye"]],
+["Which arcade game is Ralph from in Wreck-It Ralph?","Fix-It Felix Jr.",["Sugar Rush","Hero's Duty","Pac-Land"]],
+["What animal does Mei turn into in Turning Red?","A giant red panda",["A fox","A dragon","A raccoon"]],
+["What is Ursula's pair of eels called?","Flotsam and Jetsam",["Jet and Sam","Gus and Gus","Slither and Slide"]],
+["What kind of bird is Zazu in The Lion King?","A hornbill",["A parrot","A toucan","A hawk"]],
+["What is the name of the rooster in Moana?","Heihei",["Chanticleer","Rocky","Foghorn"]],
+["What is the name of Miguel's dog in Coco?","Dante",["Pepita","Pluto","Abuelita"]],
+["What is the name of the cat in Cinderella?","Lucifer",["Figaro","Oliver","Duchess"]]
+];
+
+/* ---------- HELPERS ---------- */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>String(s).toLowerCase().replace(/\(.*?\)/g,' ').replace(/[’']/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+const view=h=>{app.innerHTML=h;window.scrollTo(0,0)};
+function fetchT(u,ms){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(u,{signal:c.signal}).then(r=>{if(!r.ok)throw new Error('http');return r}).finally(()=>clearTimeout(t))}
+function jsonp(url,ms=7000){return new Promise((res,rej)=>{const cb='cb'+Date.now()+rnd(1e6);const s=document.createElement('script');const t=setTimeout(()=>{clean();rej(new Error('timeout'))},ms);function clean(){clearTimeout(t);delete window[cb];s.remove()}window[cb]=d=>{clean();res(d)};s.onerror=()=>{clean();rej(new Error('jsonp'))};s.src=url+'&callback='+cb;document.head.appendChild(s)})}
+function preload(src){return new Promise((res,rej)=>{const im=new Image();const t=setTimeout(()=>rej(new Error('t')),9000);im.onload=()=>{clearTimeout(t);im.naturalWidth<120?rej(new Error('small')):res(im)};im.onerror=()=>{clearTimeout(t);rej(new Error('err'))};im.src=src})}
+function mk(correct,pool){const wrong=pick([...new Set(pool)].filter(x=>x!==correct),3);const options=shuffle([correct,...wrong]);return{options,answer:options.indexOf(correct)}}
+
+/* ---------- CONTENT FETCHERS ---------- */
+const songCache=new Map(), imgCache=new Map();
+async function itunes(term){
+  const url='https://itunes.apple.com/search?media=music&entity=song&limit=20&term='+encodeURIComponent(term);
+  try{return await (await fetchT(url,7000)).json()}catch(e){return await jsonp(url)}
+}
+async function findPreview(title,movie){
+  const key=title+'|'+movie; if(songCache.has(key))return songCache.get(key);
+  let best=null;
+  try{
+    const d=await itunes(title+' '+movie); const t=norm(title); let bs=-1;
+    for(const r of d.results||[]){
+      if(!r.previewUrl)continue;
+      const n=norm(r.trackName); if(!(n===t||n.startsWith(t+' ')))continue;
+      const coll=norm((r.collectionName||'')+' '+(r.artistName||''));
+      let sc=0; if(coll.includes(norm(movie)))sc+=3; if(/soundtrack|disney|cast|original/.test(coll))sc+=2; if(/karaoke|tribute|lullaby|instrumental|made famous|kids|piano/.test(coll))sc-=6;
+      if(sc>bs){bs=sc;best=r}
+    }
+    if(bs<2)best=null;
+  }catch(e){best=null}
+  songCache.set(key,best); return best;
+}
+async function fetchCharImage(name){
+  if(imgCache.has(name))return imgCache.get(name);
+  const e=encodeURIComponent;
+  const urls=[
+   'https://disney.fandom.com/api.php?action=query&redirects=1&titles='+e(name)+'&prop=pageimages&pithumbsize=800&format=json&origin=*',
+   'https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+e(name+' Disney character')+'&gsrlimit=1&prop=pageimages&pithumbsize=800&format=json&origin=*'
+  ];
+  let found=null;
+  for(const u of urls){
+    try{
+      const j=await (await fetchT(u,7000)).json(); const pages=j.query&&j.query.pages;
+      if(pages){for(const k in pages){const t=pages[k].thumbnail; if(t&&t.source){found=t.source;break}}}
+      if(found){try{await preload(found)}catch(e){found=null}}
+      if(found)break;
+    }catch(e){}
+  }
+  imgCache.set(name,found); return found;
+}
+
+/* ---------- QUESTION BUILDERS ---------- */
+const BUILD={
+  async song(){
+    for(let a=0;a<6;a++){
+      const cand=SONGS.filter(s=>!G.used.has('s'+s[0])); if(!cand.length)return null;
+      const s=cand[rnd(cand.length)]; G.used.add('s'+s[0]);
+      const r=await findPreview(s[0],s[1]); if(!r)continue;
+      const asMovie=Math.random()<.35;
+      const m=asMovie?mk(s[1],SONGS.map(x=>x[1])):mk(s[0],SONGS.map(x=>x[0]));
+      try{const w=new Audio();w.preload='auto';w.src=r.previewUrl}catch(e){}
+      return{type:'song',prompt:asMovie?'Which movie is this song from?':'Name this song',audio:r.previewUrl,...m,reveal:s[0]+' — '+s[1]};
+    }
+    return null;
+  },
+  async char(){
+    for(let a=0;a<6;a++){
+      const cand=CHARS.filter(c=>!G.used.has('c'+c)); if(!cand.length)return null;
+      const c=cand[rnd(cand.length)]; G.used.add('c'+c);
+      const img=await fetchCharImage(c); if(!img)continue;
+      return{type:'char',prompt:'Who is this character?',img,...mk(c,CHARS),reveal:c};
+    }
+    return null;
+  },
+  async emoji(){
+    const cand=EMOJI.filter(e=>!G.used.has('e'+e[1])); if(!cand.length)return null;
+    const e=cand[rnd(cand.length)]; G.used.add('e'+e[1]);
+    return{type:'emoji',prompt:'Which movie is this?',emoji:e[0],...mk(e[1],EMOJI.map(x=>x[1])),reveal:e[1]};
+  },
+  async text(){
+    let cand=TEXT.filter(t=>!G.used.has('t'+t[0])); if(!cand.length){TEXT.forEach(t=>G.used.delete('t'+t[0]));cand=TEXT}
+    const t=cand[rnd(cand.length)]; G.used.add('t'+t[0]);
+    return{type:'text',prompt:'Trivia',text:t[0],...mk(t[1],t[2]),reveal:t[1]};
+  }
+};
+async function makeQuestion(){
+  let order=shuffle(Object.keys(G.types).filter(k=>G.types[k]));
+  if(order.length>1&&G.lastType){order=order.filter(k=>k!==G.lastType).concat(order.filter(k=>k===G.lastType))}
+  for(const t of order){try{const q=await BUILD[t](); if(q)return q}catch(e){}}
+  return await BUILD.text();
+}
+
+/* ---------- SETTINGS / SETUP ---------- */
+let S={players:['Player 1'],total:10,types:{song:1,char:1,emoji:1,text:1}};
+try{const x=JSON.parse(localStorage.getItem('ouaq')||'null');if(x&&x.players)S=Object.assign(S,x)}catch(e){}
+const save=()=>{try{localStorage.setItem('ouaq',JSON.stringify(S))}catch(e){}};
+let G={};
+const audio=new Audio(); audio.preload='auto';
+
+function showSetup(){
+  const names=S.players.map((p,i)=>`<div class="row"><input value="${esc(p)}" maxlength="14" oninput="S.players[${i}]=this.value">${S.players.length>1?`<button class="x" onclick="rmP(${i})">✕</button>`:''}</div>`).join('');
+  const chips=[['song','🎵 Songs'],['char','🖼️ Characters'],['emoji','🧩 Emoji'],['text','❓ Trivia']].map(([k,l])=>`<button class="chip ${S.types[k]?'on':''}" onclick="tg('${k}')">${l}</button>`).join('');
+  view(`<h1>✨ Once Upon a Quiz</h1><p class="sub">Pass-the-phone Disney trivia</p>
+  <div class="card"><div class="lbl">Questions</div><div class="step"><button onclick="setN(-5)">−</button><b>${S.total}</b><button onclick="setN(5)">+</button><span class="hint" style="margin-left:auto">5–50</span></div></div>
+  <div class="card"><div class="lbl">Question types</div><div class="chips">${chips}</div></div>
+  <div class="card"><div class="lbl">Players</div>${names}${S.players.length<6?`<button class="ghost" onclick="addP()">+ Add player</button>`:''}</div>
+  <button class="big" onclick="startGame()">Start game</button>
+  <button class="ghost" onclick="runTest()">Check content (tests song &amp; image lookups)</button>`);
+}
+function tg(k){S.types[k]=S.types[k]?0:1;if(!Object.values(S.types).some(Boolean))S.types[k]=1;save();showSetup()}
+function setN(d){S.total=Math.max(5,Math.min(50,S.total+d));save();showSetup()}
+function addP(){S.players.push('Player '+(S.players.length+1));showSetup()}
+function rmP(i){S.players.splice(i,1);showSetup()}
+
+/* ---------- GAME FLOW ---------- */
+function loading(msg){view(`<div class="center" style="padding-top:90px"><div class="spin">✨</div><p class="sub">${msg||'Picking a question…'}</p></div>`)}
+function startGame(){
+  S.players=S.players.map((p,i)=>p.trim()||'Player '+(i+1)); save();
+  G={players:S.players.map(n=>({name:n,score:0})),total:S.total,types:{...S.types},idx:0,used:new Set(),q:null,pre:null,lastType:null};
+  advance();
+}
+async function advance(){
+  loading();
+  const q=await (G.pre||makeQuestion()); G.pre=null; G.q=q; G.lastType=q.type;
+  const p=G.players[G.idx%G.players.length];
+  const many=G.players.length>1;
+  view(`<div class="center" style="padding-top:60px"><div class="hint">Question ${G.idx+1} of ${G.total}</div>
+  <h1>${many?'Pass to':''} ${esc(p.name)}</h1><p class="sub">${q.type==='song'?'🔊 Turn your sound on':'Ready?'}</p>
+  <button class="big" onclick="beginQ()">I'm ready</button></div>`);
+}
+function beginQ(){
+  const q=G.q,p=G.players[G.idx%G.players.length];
+  G.done=false;G.plays=0;
+  let stage='';
+  if(q.type==='song')stage=`<div class="stage song"><button class="bigplay" onclick="replay()">▶</button><div class="bar"><i id="bar"></i></div></div><p class="hint" id="ph">Plays 5 seconds · each replay costs points</p>`;
+  else if(q.type==='char')stage=`<div class="stage zoom"><img id="zi" src="${esc(q.img)}" alt=""></div><p class="hint">It zooms out — guess early for more points</p>`;
+  else if(q.type==='emoji')stage=`<div class="stage emo">${q.emoji}</div>`;
+  else stage=`<div class="stage txt">${esc(q.text)}</div>`;
+  view(`<div class="top"><span>Question ${G.idx+1}/${G.total}</span><span>${esc(p.name)} · ${p.score} pts</span></div>
+  <h2>${esc(q.prompt)}</h2>${stage}
+  <div class="choices">${q.options.map((o,i)=>`<button class="opt" onclick="answer(${i})">${esc(o)}</button>`).join('')}</div>
+  <div id="after"></div>`);
+  if(q.type==='song'){audio.src=q.audio;playClip()}
+  if(q.type==='char')startZoom();
+  if(G.idx+1<G.total)G.pre=makeQuestion();
+}
+function playClip(){
+  G.armed=true;
+  audio.onplaying=()=>{
+    if(!G.armed)return;G.armed=false;
+    clearTimeout(G.st);cancelAnimationFrame(G.barRaf);
+    const t0=performance.now(),bar=$('#bar');
+    const f=n=>{const x=Math.min(1,(n-t0)/5000);if(bar)bar.style.width=(x*100)+'%';if(x<1)G.barRaf=requestAnimationFrame(f)};
+    G.barRaf=requestAnimationFrame(f);
+    G.st=setTimeout(()=>audio.pause(),5000);
+  };
+  G.plays++;
+  try{audio.currentTime=0}catch(e){}
+  const pr=audio.play(); if(pr&&pr.catch)pr.catch(()=>{const h=$('#ph');if(h)h.textContent='Tap ▶ to play'});
+}
+function replay(){if(!G.done)playClip()}
+function startZoom(){
+  const im=$('#zi');if(!im)return;
+  im.style.transformOrigin=(35+rnd(31))+'% '+(30+rnd(31))+'%';
+  const t0=performance.now(),D=14000;G.zp=0;
+  const f=n=>{G.zp=Math.min(1,(n-t0)/D);im.style.transform='scale('+Math.pow(7,1-G.zp)+')';if(G.zp<1&&!G.done)G.raf=requestAnimationFrame(f)};
+  G.raf=requestAnimationFrame(f);
+}
+function answer(i){
+  if(G.done)return;G.done=true;
+  const q=G.q,p=G.players[G.idx%G.players.length];
+  clearTimeout(G.st);cancelAnimationFrame(G.barRaf);cancelAnimationFrame(G.raf);audio.pause();
+  const ok=i===q.answer;
+  let pts=0;
+  if(ok){
+    pts=100;
+    if(q.type==='song')pts=Math.max(40,100-20*(G.plays-1));
+    if(q.type==='char')pts=Math.round(100-60*(G.zp||0));
+    p.score+=pts;
+  }
+  const zi=$('#zi');if(zi){zi.style.transition='transform .6s';zi.style.transform='scale(1)'}
+  document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(j===q.answer)b.classList.add('ok');else if(j===i)b.classList.add('bad')});
+  const last=G.idx+1>=G.total;
+  $('#after').innerHTML=`<p class="reveal">${ok?`✅ Correct! <b>+${pts}</b>`:'❌ Nope'}<br><b>${esc(q.reveal)}</b></p>
+  <button class="big" onclick="nextQ()">${last?'See results':'Next question'}</button>`;
+}
+function nextQ(){G.idx++;if(G.idx>=G.total)showResults();else advance()}
+function showResults(){
+  const r=[...G.players].sort((a,b)=>b.score-a.score);
+  const medals=['🥇','🥈','🥉'];
+  const multi=G.players.length>1;
+  view(`<h1>${multi?'🏆 '+esc(r[0].name)+' wins!':'🎉 Done!'}</h1><p class="sub">Final scores</p>
+  <div class="card">${r.map((p,i)=>`<div class="score"><span>${multi?(medals[i]||'')+' ':''}${esc(p.name)}</span><b>${p.score}</b></div>`).join('')}</div>
+  <button class="big" onclick="startGame()">Play again</button>
+  <button class="ghost" onclick="showSetup()">Change settings</button>`);
+}
+
+/* ---------- CONTENT TEST ---------- */
+async function pool(items,n,fn){let i=0;await Promise.all(Array.from({length:n},async()=>{while(i<items.length){const it=items[i++];await fn(it)}}))}
+async function runTest(){
+  view(`<div class="card"><h2>Checking content…</h2><pre id="log">Starting…</pre></div>`);
+  const log=$('#log');let badC=[],okC=0,badS=[],okS=0;
+  await pool(CHARS,5,async c=>{const u=await fetchCharImage(c);u?okC++:badC.push(c);log.textContent=`Characters: ${okC+badC.length}/${CHARS.length}\nSongs: ${okS+badS.length}/${SONGS.length}`});
+  await pool(SONGS,5,async s=>{const r=await findPreview(s[0],s[1]);r?okS++:badS.push(s[0]);log.textContent=`Characters: ${okC+badC.length}/${CHARS.length}\nSongs: ${okS+badS.length}/${SONGS.length}`});
+  view(`<div class="card"><h2>Results</h2>
+  <p>🖼️ Characters with images: <b>${okC}/${CHARS.length}</b></p>${badC.length?`<pre>Missing: ${esc(badC.join(', '))}</pre>`:''}
+  <p>🎵 Songs with previews: <b>${okS}/${SONGS.length}</b></p>${badS.length?`<pre>Missing: ${esc(badS.join(', '))}</pre>`:''}
+  <p class="hint">Missing items are skipped automatically during games.</p></div>
+  <button class="big" onclick="showSetup()">Back</button>`);
+}
+
+showSetup();
+</script>
+</body>
+</html>
