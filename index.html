@@ -331,14 +331,14 @@ async function findPreview(title,movie){
 }
 async function wikiImage(name){
   const e=encodeURIComponent, first=norm(name).split(' ')[0];
-  const s=await (await fetchT('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+e(name+' '+(CHARDATA[name]||'Disney')+' character')+'&srlimit=4&format=json&origin=*',7000)).json();
+  const s=await (await fetchT('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+e(name+' '+(/disney|pixar/i.test(CHARDATA[name]||'')?CHARDATA[name]:(CHARDATA[name]||'')+' Disney')+' character')+'&srlimit=4&format=json&origin=*',7000)).json();
   for(const h of (s.query&&s.query.search)||[]){
     if(/film|soundtrack|album|series|video game|franchise|list of|season/i.test(h.title))continue;
     if(!norm(h.title).includes(first))continue;
     try{
       const r=await (await fetchT('https://en.wikipedia.org/api/rest_v1/page/summary/'+e(h.title.replace(/ /g,'_')),7000)).json();
       const desc=(r.description||'')+' '+(r.extract||'');
-      if(!/fictional|character|animated|disney|pixar|cartoon|mascot/i.test(desc)||/\b(born \d|is an american|was an american)\b/i.test(desc))continue;
+      if(!/disney|pixar/i.test(desc)||/\b(born \d|is an american|was an american)\b/i.test(desc))continue;
       let src=r.thumbnail&&r.thumbnail.source;
       if(src&&r.originalimage&&r.originalimage.width>=960&&/\/\d+px-/.test(src))src=src.replace(/\/\d+px-/,'/960px-');
       else if(r.originalimage&&r.originalimage.width<960)src=r.originalimage.source;
